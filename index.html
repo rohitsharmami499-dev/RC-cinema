@@ -3,93 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RC Cinema</title>
+    <title>FlashInfo - Movies, OTT & Cricket Updates</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-        body { background-color: #f4f4f4; color: #333; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0f172a; color: #f8fafc; }
         
-        header { background-color: #0088cc; color: white; text-align: center; padding: 15px; font-size: 24px; font-weight: bold; }
+        /* Header & Nav */
+        header { background: #1e293b; padding: 15px 20px; text-align: center; border-bottom: 2px solid #eab308; position: sticky; top: 0; z-index: 100; }
+        h1 { color: #eab308; margin-bottom: 10px; font-size: 26px; }
         
-        .search-container { padding: 10px; background: #fff; text-align: center; border-bottom: 1px solid #ccc; }
-        .search-container input { padding: 8px; width: 60%; max-width: 300px; border: 1px solid #aaa; border-radius: 4px; }
-        .search-container button { padding: 8px 15px; background: #0088cc; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        /* Search Box */
+        .search-box { margin: 10px auto; max-width: 500px; display: flex; gap: 5px; }
+        .search-box input { flex: 1; padding: 10px; border-radius: 5px; border: none; outline: none; }
+        .search-box button { padding: 10px 15px; background: #eab308; color: #0f172a; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
 
-        .category-header { background: #0088cc; color: white; padding: 8px 12px; font-size: 16px; font-weight: bold; margin-top: 10px; }
-        .movie-list { list-style: none; background: white; }
-        .movie-item { border-bottom: 1px solid #eee; padding: 12px 15px; display: block; text-decoration: none; color: #006699; font-weight: bold; font-size: 15px; }
-        .movie-item:hover { background: #f0f8ff; }
-        .quality-tag { color: #555; font-weight: normal; font-size: 13px; }
+        /* Navigation Categories */
+        nav { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+        nav button { background: #334155; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: 0.3s; }
+        nav button:hover, nav button.active { background: #eab308; color: #0f172a; font-weight: bold; }
 
-        /* Movie Details View */
-        #movie-details-view { display: none; background: white; padding: 15px; margin: 10px; border: 1px solid #ccc; text-align: center; }
-        .poster-img { width: 100%; max-width: 250px; border-radius: 8px; margin: 10px 0; }
-        .btn-download { display: block; background: #28a745; color: white; text-align: center; padding: 12px; margin: 10px 0; border-radius: 5px; text-decoration: none; font-weight: bold; font-size: 16px; }
-        .btn-back { display: inline-block; background: #6c757d; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; margin-bottom: 15px; }
+        /* Cricket Section */
+        .cricket-banner { background: #15803d; color: #fff; padding: 10px; text-align: center; font-size: 14px; margin: 15px 20px; border-radius: 8px; }
+
+        /* Movies Grid */
+        .container { padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
+        .movie-card { background: #1e293b; border-radius: 8px; overflow: hidden; position: relative; transition: transform 0.2s; cursor: pointer; }
+        .movie-card:hover { transform: translateY(-5px); }
+        .movie-card img { width: 100%; height: 260px; object-fit: cover; }
+        .movie-info { padding: 10px; }
+        .movie-title { font-size: 14px; font-weight: bold; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .movie-meta { font-size: 12px; color: #94a3b8; display: flex; justify-content: space-between; }
+        .rating { color: #f59e0b; font-weight: bold; }
+        .ott-badge { display: inline-block; background: #0284c7; color: white; font-size: 11px; padding: 3px 6px; border-radius: 4px; margin-top: 5px; }
+
+        /* Modal for Movie Details */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: #1e293b; padding: 20px; border-radius: 10px; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; color: #fff; }
+        .close-btn { float: right; font-size: 22px; cursor: pointer; color: #ef4444; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <header>🎬 RC Cinema</header>
+    <header>
+        <h1>⚡ FlashInfo</h1>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search Movies (e.g., Pushpa, Marvel)...">
+            <button onclick="searchMovie()">Search</button>
+        </div>
+        <nav>
+            <button class="active" onclick="filterLanguage('te', this)">Telugu</button>
+            <button onclick="filterLanguage('kn', this)">Kannada</button>
+            <button onclick="filterLanguage('hi', this)">Hindi</button>
+            <button onclick="filterLanguage('en', this)">Hollywood/DC/Marvel</button>
+            <button onclick="showCricketAlert()">🏏 Cricket Updates</button>
+        </nav>
+    </header>
 
-    <!-- Search Section -->
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Enter Movie Name..." onkeyup="searchMovie()">
-        <button onclick="searchMovie()">Search</button>
+    <div class="cricket-banner" id="cricketBox">
+        📢 <b>FlashInfo Sports:</b> Instant Cricket Updates & Match Info (Click Cricket Updates above)
     </div>
 
-    <!-- Movie List Section -->
-    <div id="movie-list-view">
-        <div class="category-header">Latest Updates!!</div>
-        <ul class="movie-list" id="movieList">
-            
-            <!-- Movie 1: Keeda Cola -->
-            <li>
-                <a href="#" class="movie-item" onclick="openMovieDetails('Keeda Cola (2026) Telugu HDRip', 'poster.jpg', '1C67yYUlCpnb2scMHM4NkHEYb_XFME-SJ')">
-                    » Keeda Cola (2026) Telugu HDRip <span class="quality-tag">-[HD Mp4]</span>
-                </a>
-            </li>
-
-        </ul>
+    <div class="container" id="moviesContainer">
+        <!-- Movies will load automatically here -->
     </div>
 
-    <!-- Movie Detail View -->
-    <div id="movie-details-view">
-        <a href="#" class="btn-back" onclick="closeMovieDetails()">← Back to List</a>
-        <h2 id="detail-title">Movie Title</h2>
-        <img id="detail-poster" class="poster-img" src="" alt="Movie Poster">
-        
-        <p style="margin: 10px 0; color: #666;">Category: Telugu New Movies</p>
-        
-        <!-- Direct Download Button -->
-        <a id="detail-download" href="#" class="btn-download" target="_blank">📥 Download Movie (HD Mp4)</a>
+    <!-- Details Modal -->
+    <div class="modal" id="movieModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div id="modalDetails"></div>
+        </div>
     </div>
 
     <script>
-        function searchMovie() {
-            let input = document.getElementById('searchInput').value.toLowerCase();
-            let items = document.querySelectorAll('#movieList li');
-            items.forEach(item => {
-                let text = item.innerText.toLowerCase();
-                item.style.display = text.includes(input) ? "" : "none";
+        const API_KEY = '8265a91d2b82cc32d3b59a383fdb30c4'; 
+        const BASE_URL = 'https://api.themoviedb.org/3';
+        const IMG_URL = 'https://image.tmdb.org/t/p/w500';
+
+        let currentLang = 'te';
+
+        window.onload = () => {
+            loadMovies(currentLang);
+        };
+
+        async function loadMovies(lang) {
+            const container = document.getElementById('moviesContainer');
+            container.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">Loading Movies...</p>';
+            
+            try {
+                const res = await fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=${lang}&sort_by=popularity.desc`);
+                const data = await res.json();
+                displayMovies(data.results);
+            } catch (err) {
+                container.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">Error loading movies!</p>';
+            }
+        }
+
+        function displayMovies(movies) {
+            const container = document.getElementById('moviesContainer');
+            container.innerHTML = '';
+
+            if(!movies || movies.length === 0) {
+                container.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">No movies found!</p>';
+                return;
+            }
+
+            movies.forEach(movie => {
+                const card = document.createElement('div');
+                card.className = 'movie-card';
+                card.onclick = () => showDetails(movie.id);
+                
+                const poster = movie.poster_path ? IMG_URL + movie.poster_path : 'https://via.placeholder.com/500x750?text=No+Poster';
+                
+                card.innerHTML = `
+                    <img src="${poster}" alt="${movie.title}">
+                    <div class="movie-info">
+                        <div class="movie-title">${movie.title}</div>
+                        <div class="movie-meta">
+                            <span>📅 ${movie.release_date ? movie.release_date.split('-')[0] : 'N/A'}</span>
+                            <span class="rating">⭐ ${movie.vote_average.toFixed(1)}</span>
+                        </div>
+                        <span class="ott-badge">Click for Details / OTT</span>
+                    </div>
+                `;
+                container.appendChild(card);
             });
         }
 
-        function openMovieDetails(title, posterUrl, fileId) {
-            document.getElementById('movie-list-view').style.display = 'none';
-            document.getElementById('movie-details-view').style.display = 'block';
+        async function searchMovie() {
+            const query = document.getElementById('searchInput').value;
+            if(!query) return;
             
-            document.getElementById('detail-title').innerText = title;
-            document.getElementById('detail-poster').src = posterUrl;
-            document.getElementById('detail-download').href = "https://drive.google.com/uc?export=download&id=" + fileId;
+            const container = document.getElementById('moviesContainer');
+            container.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">Searching...</p>';
+
+            const res = await fetch(`${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            displayMovies(data.results);
         }
 
-        function closeMovieDetails() {
-            document.getElementById('movie-details-view').style.display = 'none';
-            document.getElementById('movie-list-view').style.display = 'block';
+        function filterLanguage(lang, btn) {
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentLang = lang;
+            loadMovies(lang);
+        }
+
+        async function showDetails(movieId) {
+            const modal = document.getElementById('movieModal');
+            const detailsDiv = document.getElementById('modalDetails');
+            
+            const providerRes = await fetch(`${BASE_URL}/movie/${movieId}/watch/providers?api_key=${API_KEY}`);
+            const providerData = await providerRes.json();
+            const inProviders = providerData.results?.IN;
+
+            let ottInfo = '<p style="margin-top:10px;"><b>OTT Availability (India):</b> Information not updated yet / Theatres only.</p>';
+            if (inProviders) {
+                if (inProviders.flatrate) {
+                    const platforms = inProviders.flatrate.map(p => p.provider_name).join(', ');
+                    ottInfo = `<p style="color:#22c55e; margin-top:10px;"><b>Subscription / Paid Stream:</b> ${platforms}</p>`;
+                } else if (inProviders.free) {
+                    const freePlatforms = inProviders.free.map(p => p.provider_name).join(', ');
+                    ottInfo = `<p style="color:#38bdf8; margin-top:10px;"><b>Free Stream Available On:</b> ${freePlatforms}</p>`;
+                } else if (inProviders.rent) {
+                    const rentPlatforms = inProviders.rent.map(p => p.provider_name).join(', ');
+                    ottInfo = `<p style="color:#f59e0b; margin-top:10px;"><b>Available for Rent:</b> ${rentPlatforms}</p>`;
+                }
+            }
+
+            const movieRes = await fetch(`${BASE_URL}/movie/${movieId}?api_key=${API_KEY}`);
+            const movie = await movieRes.json();
+
+            detailsDiv.innerHTML = `
+                <h2>${movie.title}</h2>
+                <p style="margin: 10px 0; color: #cbd5e1; font-size:14px; line-height:1.4;">${movie.overview || 'Story overview not available.'}</p>
+                <hr style="margin: 10px 0; border-color: #334155;">
+                ${ottInfo}
+                <p style="margin-top: 10px;"><b>Rating:</b> ⭐ ${movie.vote_average.toFixed(1)}/10</p>
+                <p style="margin-top: 5px;"><b>Release Date:</b> ${movie.release_date}</p>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('movieModal').style.display = 'none';
+        }
+
+        function showCricketAlert() {
+            alert("🏏 FlashInfo Cricket Updates:\n\nLatest cricket news & live scores will be integrated here!");
         }
     </script>
-
 </body>
 </html>
+
 
 
