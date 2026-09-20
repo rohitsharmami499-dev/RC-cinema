@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RC Cinema</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { background-color: #f4f4f4; color: #333; }
+        
+        header { background-color: #0088cc; color: white; text-align: center; padding: 15px; font-size: 24px; font-weight: bold; }
+        
+        .search-container { padding: 10px; background: #fff; text-align: center; border-bottom: 1px solid #ccc; }
+        .search-container input { padding: 8px; width: 60%; max-width: 300px; border: 1px solid #aaa; border-radius: 4px; }
+        .search-container button { padding: 8px 15px; background: #0088cc; color: white; border: none; border-radius: 4px; cursor: pointer; }
+
+        .category-header { background: #0088cc; color: white; padding: 8px 12px; font-size: 16px; font-weight: bold; margin-top: 10px; }
+        .movie-list { list-style: none; background: white; }
+        .movie-item { border-bottom: 1px solid #eee; padding: 12px 15px; display: block; text-decoration: none; color: #006699; font-weight: bold; font-size: 15px; }
+        .movie-item:hover { background: #f0f8ff; }
+        .quality-tag { color: #555; font-weight: normal; font-size: 13px; }
+
+        /* Movie Details View */
+        #movie-details-view { display: none; background: white; padding: 15px; margin: 10px; border: 1px solid #ccc; text-align: center; }
+        .poster-img { width: 100%; max-width: 250px; border-radius: 8px; margin: 10px 0; }
+        .btn-download { display: block; background: #28a745; color: white; text-align: center; padding: 12px; margin: 10px 0; border-radius: 5px; text-decoration: none; font-weight: bold; font-size: 16px; }
+        .btn-back { display: inline-block; background: #6c757d; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+    <header>🎬 RC Cinema</header>
+
+    <!-- Search Section -->
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Enter Movie Name..." onkeyup="searchMovie()">
+        <button onclick="searchMovie()">Search</button>
+    </div>
+
+    <!-- Movie List Section -->
+    <div id="movie-list-view">
+        <div class="category-header">Latest Updates!!</div>
+        <ul class="movie-list" id="movieList">
+            
+            <!-- Movie 1: Keeda Cola -->
+            <li>
+                <a href="#" class="movie-item" onclick="openMovieDetails('Keeda Cola (2026) Telugu HDRip', 'poster.jpg', '1C67yYUlCpnb2scMHM4NkHEYb_XFME-SJ')">
+                    » Keeda Cola (2026) Telugu HDRip <span class="quality-tag">-[HD Mp4]</span>
+                </a>
+            </li>
+
+        </ul>
+    </div>
+
+    <!-- Movie Detail View -->
+    <div id="movie-details-view">
+        <a href="#" class="btn-back" onclick="closeMovieDetails()">← Back to List</a>
+        <h2 id="detail-title">Movie Title</h2>
+        <img id="detail-poster" class="poster-img" src="" alt="Movie Poster">
+        
+        <p style="margin: 10px 0; color: #666;">Category: Telugu New Movies</p>
+        
+        <!-- Direct Download Button -->
+        <a id="detail-download" href="#" class="btn-download" target="_blank">📥 Download Movie (HD Mp4)</a>
+    </div>
+
+    <script>
+        function searchMovie() {
+            let input = document.getElementById('searchInput').value.toLowerCase();
+            let items = document.querySelectorAll('#movieList li');
+            items.forEach(item => {
+                let text = item.innerText.toLowerCase();
+                item.style.display = text.includes(input) ? "" : "none";
+            });
+        }
+
+        function openMovieDetails(title, posterUrl, fileId) {
+            document.getElementById('movie-list-view').style.display = 'none';
+            document.getElementById('movie-details-view').style.display = 'block';
+            
+            document.getElementById('detail-title').innerText = title;
+            document.getElementById('detail-poster').src = posterUrl;
+            document.getElementById('detail-download').href = "https://drive.google.com/uc?export=download&id=" + fileId;
+        }
+
+        function closeMovieDetails() {
+            document.getElementById('movie-details-view').style.display = 'none';
+            document.getElementById('movie-list-view').style.display = 'block';
+        }
+    </script>
+
+</body>
+</html>
+
+
