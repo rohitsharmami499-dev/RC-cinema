@@ -46,18 +46,21 @@
 
     <header>
         <h1>⚡ FlashInfo</h1>
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Search Movies (e.g., Pushpa, Marvel)...">
-            <button onclick="searchMovie()">Search</button>
-        </div>
+        <div style="position: relative; max-width: 500px; margin: 0 auto;">
+    <input type="text" id="searchInput" placeholder="Search Movies or Web Series..." oninput="handleSearchInput(this.value)">
+    <button onclick="performSearch()">Search</button>
+    <div id="suggestionsBox" class="suggestions-box"></div>
+</div>
+
         <nav>
-    <button class="active" onclick="filterType('movie')">🎬 Movies</button>
-    <button onclick="filterType('tv')">📺 Web Series</button>
-    <button onclick="filterLanguage('te')">Telugu</button>
-    <button onclick="filterLanguage('hi')">Hindi</button>
-    <button onclick="filterLanguage('en')">English</button>
-    <button onclick="showGamesSection()">🎮 Free Games</button>
-    <button onclick="showCricketAlert()">🏏 Cricket Updates</button>
+    <button onclick="filterType('movie')">🎬 Movies</button>
+<button onclick="filterType('tv')">📺 Web Series</button>
+<button class="active" onclick="filterLanguage('te', this)">Telugu</button>
+<button onclick="filterLanguage('hi', this)">Hindi</button>
+<button onclick="filterLanguage('en', this)">English</button>
+<button onclick="filterLanguage('kn', this)">Kannada</button>
+<button onclick="showGamesSection()">🎮 Free Games</button>
+            
 </nav>
 
     </header>
@@ -113,14 +116,18 @@ window.onload = () => {
     fetchContent(currentMediaType, currentLang);
 };
 
+// 1. Movies / Web Series Fetching Logic (సీరియల్స్ లేకుండా ఓన్లీ వెబ్ సిరీస్)
 async function fetchContent(type = 'movie', lang = currentLang) {
     currentMediaType = type;
     document.getElementById("gamesContainer").style.display = "none";
     document.getElementById("moviesContainer").style.display = "grid";
 
-    const endpoint = type === 'tv' 
-        ? `${BASE_URL}/discover/tv?api_key=${API_KEY}&with_original_language=${lang}&sort_by=popularity.desc`
-        : `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=${lang}&sort_by=popularity.desc`;
+    let endpoint = '';
+    if (type === 'tv') {
+        endpoint = `${BASE_URL}/discover/tv?api_key=${API_KEY}&with_original_language=${lang}&sort_by=popularity.desc&without_genres=10766,10763,10767`; 
+    } else {
+        endpoint = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=${lang}&sort_by=popularity.desc`;
+    }
 
     try {
         const res = await fetch(endpoint);
@@ -144,17 +151,52 @@ function filterLanguage(lang, btn) {
     fetchContent(currentMediaType, lang);
 }
 
-function showGamesSection() {
-    document.getElementById("moviesContainer").style.display = "none";
-    document.getElementById("gamesContainer").style.display = "block";
+// 2. Search Box Live Suggestions Logic
+async function handleSearchInput(query) {
+    const box = document.getElementById('suggestionsBox');
+    if (!query || query.trim().length < 2) {
+        box.innerHTML = '';
+        return;
+    }
+
+    try {
+        const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        
+        const filtered = (data.results || []).filter(item => item.media_type === 'movie' || item.media_type === 'tv').slice(0, 5);
+        
+        box.innerHTML = '';
+        filtered.forEach(item => {
+            const title = item.title || item.name;
+            const img = item.poster_path ? IMG_URL + item.poster_path : 'https://via.placeholder.com/40';
+            const div = document.createElement('div');
+            div.className = 'suggestion-item';
+            div.innerHTML = `<img src="${img}" style="width:30px; height:40px; border-radius:4px;"> <span>${title} (${item.media_type === 'tv' ? 'Series' : 'Movie'})</span>`;
+            div.onclick = () => {
+                showDetails(item.id, item.media_type);
+                box.innerHTML = '';
+            };
+            box.appendChild(div);
+        });
+    } catch(e) {
+        box.innerHTML = '';
+    }
 }
 
+function performSearch() {
+    const query = document.getElementById('searchInput').value;
+    if (query) {
+        handleSearchInput(query);
+    }
+}
+
+// 3. Display Items Logic
 function displayItems(items, type) {
     const container = document.getElementById('moviesContainer');
     container.innerHTML = '';
 
     if (!items || items.length === 0) {
-        container.innerHTML = '<p style="color:#fff; text-align:center;">No items found.</p>';
+        container.innerHTML = '<p style="color:#fff; text-align:center;">No content found.</p>';
         return;
     }
 
@@ -174,6 +216,47 @@ function displayItems(items, type) {
         `;
         container.appendChild(card);
     });
+}
+
+// 4. Compact Games Section (యాప్ ఐకాన్ల మోడల్)
+const gameList = [
+    { name: "2048 Classic", icon: "https://play-lh.googleusercontent.com/mO_k9F3S0N7Z3o8dI4dC0x0444.png", url: "https://play2048.co/" },
+    { name: "Snake Game", icon: "https://play-lh.googleusercontent.com/97-1uEaP6a80444.png", url: "https://playsnake.org/" },
+    { name: "Tic Tac Toe", icon: "https://play-lh.googleusercontent.com/tictactoe.png", url: "https://playtictactoe.org/" }
+];
+
+function showGamesSection() {
+    document.getElementById("moviesContainer").style.display = "none";
+    const gamesCont = document.getElementById("gamesContainer");
+    gamesCont.style.display = "block";
+    
+    gamesCont.innerHTML = `
+        <h2 style="color:#fff; text-align:center; margin:15px 0;">🎮 Free Mobile Games</h2>
+        <div class="games-grid">
+            ${gameList.map(g => `
+                <div class="game-card-small" onclick="openGameModal('${g.url}')">
+                    <img src="${g.icon}" onerror="this.src='https://via.placeholder.com/60?text=Game'">
+                    <p>${g.name}</p>
+                </div>
+            `).join('')}
+        </div>
+        <div id="gameModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000;">
+            <button onclick="closeGameModal()" style="position:absolute; top:10px; right:10px; background:red; color:#fff; border:none; padding:8px 15px; border-radius:5px; font-weight:bold;">❌ Close Game</button>
+            <iframe id="gameIframe" style="width:100%; height:100%; border:none;"></iframe>
+        </div>
+    `;
+}
+
+function openGameModal(url) {
+    document.getElementById('gameIframe').src = url;
+    document.getElementById('gameModal').style.display = 'block';
+}
+
+function closeGameModal() {
+    document.getElementById('gameIframe').src = '';
+    document.getElementById('gameModal').style.display = 'none';
+}
+
 }
 
 
