@@ -10,7 +10,7 @@
         header { background: #131c38; padding: 15px; text-align: center; border-bottom: 2px solid #eab308; position: sticky; top: 0; z-index: 100; }
         .logo { font-size: 28px; font-weight: 800; color: #eab308; margin-bottom: 12px; }
         
-        .search-container { display: flex; justify-content: center; gap: 6px; max-width: 450px; margin: 0 auto 15px auto; position: relative; }
+        .search-container { display: flex; justify-content: center; gap: 6px; max-width: 450px; margin: 0 auto 15px auto; }
         .search-container input { width: 75%; padding: 10px 14px; border-radius: 6px; border: 1px solid #334155; outline: none; font-size: 14px; color: #000; }
         .search-container button { padding: 10px 16px; border-radius: 6px; border: none; background: #eab308; color: #0f172a; font-weight: bold; cursor: pointer; }
         
@@ -30,9 +30,6 @@
         .movie-info { padding: 8px; }
         .movie-info h3 { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ffffff; }
         .movie-info p { font-size: 11px; color: #94a3b8; margin-top: 4px; }
-
-        .load-more-box { text-align: center; margin: 20px 0 40px 0; }
-        .btn-load-more { background: #eab308; color: #0f172a; border: none; padding: 12px 28px; border-radius: 25px; font-size: 14px; font-weight: bold; cursor: pointer; }
 
         /* Modal Popup */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; justify-content: center; align-items: center; padding: 15px; }
@@ -76,10 +73,6 @@
 
     <div id="moviesContainer" class="movies-grid"></div>
 
-    <div class="load-more-box">
-        <button id="loadMoreBtn" class="btn-load-more" onclick="loadMoreMovies()">Load More Movies 🔄</button>
-    </div>
-
     <!-- Movie Details Popup -->
     <div id="movieModal" class="modal">
         <div class="modal-content">
@@ -96,131 +89,103 @@
     </div>
 
     <script>
-        const API_KEY = "c18512dd"; // Backup Working OMDB Key
-        const fallbackData = {
+        // Offline Built-in Database to prevent API blocking
+        const movieDatabase = {
             te: [
-                { title: "Pushpa 2: The Rule", year: "2024", rating: "8.5", poster: "https://m.media-amazon.com/images/M/MV5BN2E1Mjg3NDItNGNhMi00MDJjLWI3NTktYmZhZDJlMmI4Nzg4XkEyXkFqcGc@._V1_SX300.jpg", desc: "Pushpa Raj continues to rule the red sandalwood smuggling market while facing relentless enemies." },
+                { title: "Pushpa 2: The Rule", year: "2024", rating: "8.8", poster: "https://m.media-amazon.com/images/M/MV5BN2E1Mjg3NDItNGNhMi00MDJjLWI3NTktYmZhZDJlMmI4Nzg4XkEyXkFqcGc@._V1_SX300.jpg", desc: "Pushpa Raj continues to rule the red sandalwood smuggling market while facing relentless enemies." },
                 { title: "RRR", year: "2022", rating: "7.8", poster: "https://m.media-amazon.com/images/M/MV5BODUwNDNjYzctODUxNy00ZTA2LWIyMDctM2JhMTU5M2E2OWUxXkEyXkFqcGc@._V1_SX300.jpg", desc: "A tale of two legendary revolutionaries and their journey far away from home." },
                 { title: "Kalki 2898 AD", year: "2024", rating: "7.6", poster: "https://m.media-amazon.com/images/M/MV5BNmU4M2E3YmEtMDVjNS00NTNlLTlhMjAtMDI1NWZjMDIzNDY3XkEyXkFqcGc@._V1_SX300.jpg", desc: "A modern avatar of Vishnu, believed to have descended to earth to protect the world." },
-                { title: "Devara", year: "2024", rating: "7.1", poster: "https://m.media-amazon.com/images/M/MV5BYzA4ZDQ4NmItYzA3OS00YWI0LWI1YWMtZWY2NWJkYmJhOTk2XkEyXkFqcGc@._V1_SX300.jpg", desc: "An epic action saga set against the coastal lands of India." },
-                { title: "Salaar", year: "2023", rating: "6.5", poster: "https://m.media-amazon.com/images/M/MV5BMmU2NGNiM2YtM2JmNC00YjhmLTg1Y2ItYTVmNTM0N2NlY2I0XkEyXkFqcGc@._V1_SX300.jpg", desc: "A gang leader tries to keep a promise made to his dying friend." }
+                { title: "Devara: Part 1", year: "2024", rating: "7.1", poster: "https://m.media-amazon.com/images/M/MV5BYzA4ZDQ4NmItYzA3OS00YWI0LWI1YWMtZWY2NWJkYmJhOTk2XkEyXkFqcGc@._V1_SX300.jpg", desc: "An epic action saga set against the coastal lands of India." },
+                { title: "Salaar: Ceasefire", year: "2023", rating: "6.5", poster: "https://m.media-amazon.com/images/M/MV5BMmU2NGNiM2YtM2JmNC00YjhmLTg1Y2ItYTVmNTM0N2NlY2I0XkEyXkFqcGc@._V1_SX300.jpg", desc: "A gang leader tries to keep a promise made to his dying friend." },
+                { title: "Guntur Kaaram", year: "2024", rating: "6.2", poster: "https://m.media-amazon.com/images/M/MV5BZDQwZmE2MzYtN2E0NC00M2E1LTg3MDUtMDNlM2NmMWJhMzI3XkEyXkFqcGc@._V1_SX300.jpg", desc: "An action drama revolving around the king of the underworld in Guntur." }
             ],
             kn: [
                 { title: "K.G.F: Chapter 2", year: "2022", rating: "8.3", poster: "https://m.media-amazon.com/images/M/MV5BM2M0YmIxNzItOWI4OS00MmE3LTk3ODctYzA3OWIzNWZhNWZhXkEyXkFqcGc@._V1_SX300.jpg", desc: "In the blood-soaked Kolar Gold Fields, Rocky's name strikes fear into his foes." },
                 { title: "Kantara", year: "2022", rating: "8.2", poster: "https://m.media-amazon.com/images/M/MV5BNjQyNGI5OWEtZjI1Yy00NDVjLWE4MTAtM2FiTF00I2I3YzA4XkEyXkFqcGc@._V1_SX300.jpg", desc: "A conflict between village tradition and forestry officials." },
                 { title: "777 Charlie", year: "2022", rating: "8.8", poster: "https://m.media-amazon.com/images/M/MV5BMDk2MTAxOTUtMGQyNC00N2Y4LWE1MmUtM2E2MDI1OWJiYmJhXkEyXkFqcGc@._V1_SX300.jpg", desc: "Dharma is stuck in a rut with his negative lifestyle, until a stray pup enters his life." },
-                { title: "Vikrant Rona", year: "2022", rating: "7.0", poster: "https://m.media-amazon.com/images/M/MV5BZmNmMDlhNDktZTFlNy00NDQ0LWI0M2ItNmU3NWVmOWQ4YTkyXkEyXkFqcGc@._V1_SX300.jpg", desc: "Almost half a century ago, a remote village in the middle of a tropical rainforest starts witnessing mysterious events." }
+                { title: "Vikrant Rona", year: "2022", rating: "7.0", poster: "https://m.media-amazon.com/images/M/MV5BZmNmMDlhNDktZTFlNy00NDQ0LWI0M2ItNmU3NWVmOWQ4YTkyXkEyXkFqcGc@._V1_SX300.jpg", desc: "A remote village starts witnessing mysterious events." }
             ],
             hi: [
                 { title: "Jawan", year: "2023", rating: "7.0", poster: "https://m.media-amazon.com/images/M/MV5BMjA1NmY2YWEtMDRhNi00NTgwLWIzZmItZWI1ZjYzNGZhYThlXkEyXkFqcGc@._V1_SX300.jpg", desc: "A personal vendetta drives a man to rectify the wrongs in society." },
-                { title: "Stree 2", year: "2024", rating: "7.4", poster: "https://m.media-amazon.com/images/M/MV5BZDU1NzI2YTMtMDk4OC00N2EzLThmYjAtN2NmMDY0MmQ3NTNhXkEyXkFqcGc@._V1_SX300.jpg", desc: "The town of Chanderi is haunted again, this time by a headless entity." }
+                { title: "Stree 2", year: "2024", rating: "7.4", poster: "https://m.media-amazon.com/images/M/MV5BZDU1NzI2YTMtMDk4OC00N2EzLThmYjAtN2NmMDY0MmQ3NTNhXkEyXkFqcGc@._V1_SX300.jpg", desc: "The town of Chanderi is haunted again by a headless entity." },
+                { title: "Pathaan", year: "2023", rating: "5.9", poster: "https://m.media-amazon.com/images/M/MV5BM2QzM2JiNTMtOWM4NC00NmFlLTg2NWUtM2NmNDQ1YTIxOGU3XkEyXkFqcGc@._V1_SX300.jpg", desc: "An Indian agent battles against a mercenary group leader." }
             ],
             en: [
                 { title: "Avengers: Endgame", year: "2019", rating: "8.4", poster: "https://m.media-amazon.com/images/M/MV5BMTc5MDE2ODcwNV5BMl5BanBnXkFtZTgwMzI2NzIzNzM@._V1_SX300.jpg", desc: "After the devastating events of Infinity War, the universe is in ruins." },
-                { title: "Oppenheimer", year: "2023", rating: "8.9", poster: "https://m.media-amazon.com/images/M/MV5BN2JkMDc5MGQtMmJiNi00OWVjLWE0ZjgtZDliMTZmMGI1GJhXkEyXkFqcGc@._V1_SX300.jpg", desc: "The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb." }
+                { title: "Oppenheimer", year: "2023", rating: "8.9", poster: "https://m.media-amazon.com/images/M/MV5BN2JkMDc5MGQtMmJiNi00OWVjLWE0ZjgtZDliMTZmMGI1GJhXkEyXkFqcGc@._V1_SX300.jpg", desc: "The story of American scientist J. Robert Oppenheimer and the atomic bomb." },
+                { title: "Avatar: The Way of Water", year: "2022", rating: "7.6", poster: "https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctMzE0NC00ODBhLWFmMGItYzViNWU4MmJiEFlXkEyXkFqcGc@._V1_SX300.jpg", desc: "Jake Sully lives with his newfound family formed on the home planet of Pandora." }
+            ],
+            marvel: [
+                { title: "Deadpool & Wolverine", year: "2024", rating: "7.8", poster: "https://m.media-amazon.com/images/M/MV5BNzRiMjg0MzUtNTZmMi00M2M5LWEyYjMtMzA5MzUxM2YyNWJiXkEyXkFqcGc@._V1_SX300.jpg", desc: "Deadpool is offered a place in the Marvel Cinematic Universe." },
+                { title: "Spider-Man: No Way Home", year: "2021", rating: "8.2", poster: "https://m.media-amazon.com/images/M/MV5BZWMyYzFjYTYtNTRjYi00OGExLWE2YzgtOGRmYjAxZTU3NzBiXkEyXkFqcGc@._V1_SX300.jpg", desc: "With Spider-Man's identity revealed, Peter asks Doctor Strange for help." }
+            ],
+            dc: [
+                { title: "The Batman", year: "2022", rating: "7.8", poster: "https://m.media-amazon.com/images/M/MV5BMDdmMTBiNTYtMDIzNi00NGVlLWIzMDYtZTk3MTQ3NGQxU2FlXkEyXkFqcGc@._V1_SX300.jpg", desc: "When a sadistic serial killer begins murdering key political figures in Gotham." },
+                { title: "Joker", year: "2019", rating: "8.4", poster: "https://m.media-amazon.com/images/M/MV5BNGVjNWI4ZGUtNzE0MS00YTJmLWE0ZDctN2ZiYTk2YmI3NTYyXkEyXkFqcGc@._V1_SX300.jpg", desc: "Arthur Fleck, a party clown, leads a downward spiral into revolution." }
+            ],
+            tv: [
+                { title: "Stranger Things", year: "2016-", rating: "8.7", poster: "https://m.media-amazon.com/images/M/MV5BM2M1MmVhNDgtNmI0MS00ZDNmLThlOWUtNDJiN2ZkNzA3NzUxXkEyXkFqcGc@._V1_SX300.jpg", desc: "When a young boy vanishes, a small town uncovers a mystery involving secret experiments." },
+                { title: "Panchayat", year: "2020-", rating: "8.9", poster: "https://m.media-amazon.com/images/M/MV5BMTI5M2MyZjEtNTdhYi00MDllLWI3NTktMTI2NzExM2RjMWI2XkEyXkFqcGc@._V1_SX300.jpg", desc: "A comedy-drama, which captures the journey of an engineering graduate." },
+                { title: "The Family Man", year: "2019-", rating: "8.7", poster: "https://m.media-amazon.com/images/M/MV5BMmE1ODlhOTItNDlhMi00Y2ZhLWI4NTAtYTU3Y2M2MDlhNDhkXkEyXkFqcGc@._V1_SX300.jpg", desc: "A working man from the National Investigation Agency tries to protect his family." }
+            ],
+            movie: [
+                { title: "Pushpa 2: The Rule", year: "2024", rating: "8.8", poster: "https://m.media-amazon.com/images/M/MV5BN2E1Mjg3NDItNGNhMi00MDJjLWI3NTktYmZhZDJlMmI4Nzg4XkEyXkFqcGc@._V1_SX300.jpg", desc: "Pushpa Raj continues to rule the red sandalwood smuggling market." },
+                { title: "Kalki 2898 AD", year: "2024", rating: "7.6", poster: "https://m.media-amazon.com/images/M/MV5BNmU4M2E3YmEtMDVjNS00NTNlLTlhMjAtMDI1NWZjMDIzNDY3XkEyXkFqcGc@._V1_SX300.jpg", desc: "A modern avatar of Vishnu descended to protect the world." },
+                { title: "Deadpool & Wolverine", year: "2024", rating: "7.8", poster: "https://m.media-amazon.com/images/M/MV5BNzRiMjg0MzUtNTZmMi00M2M5LWEyYjMtMzA5MzUxM2YyNWJiXkEyXkFqcGc@._V1_SX300.jpg", desc: "Deadpool is offered a place in the Marvel Cinematic Universe." }
             ]
         };
 
-        let currentCategory = 'te';
-
         window.onload = () => {
-            loadCategory(currentCategory);
+            renderMovies(movieDatabase['te']);
         };
 
         function changeCategory(catKey, btn) {
             document.querySelectorAll('.nav-buttons button').forEach(b => b.classList.remove('active'));
             if(btn) btn.classList.add('active');
-            currentCategory = catKey;
-            loadCategory(catKey);
-        }
-
-        async function loadCategory(cat) {
-            const container = document.getElementById('moviesContainer');
-            container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">Loading movies...</p>';
-
-            // Try fetching dynamically or use fallback
-            let query = cat === 'te' ? 'Telugu' : cat === 'kn' ? 'Kannada' : cat === 'hi' ? 'Hindi' : 'Avengers';
             
-            try {
-                const res = await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&s=${query}&type=movie`);
-                const data = await res.json();
-                
-                if (data.Response === "True" && data.Search) {
-                    renderMovies(data.Search.map(item => ({
-                        title: item.Title,
-                        release: item.Year,
-                        rating: "7.8",
-                        poster: item.Poster !== "N/A" ? item.Poster : "https://via.placeholder.com/300x450",
-                        overview: `${item.Title} is a popular title released in ${item.Year}.`
-                    })));
-                } else {
-                    useFallbackData(cat);
-                }
-            } catch (err) {
-                useFallbackData(cat);
-            }
-        }
-
-        function useFallbackData(cat) {
-            const movies = fallbackData[cat] || fallbackData['te'];
-            renderMovies(movies.map(m => ({
-                title: m.title,
-                release: m.year,
-                rating: m.rating,
-                poster: m.poster,
-                overview: m.desc
-            })));
+            const movies = movieDatabase[catKey] || movieDatabase['te'];
+            renderMovies(movies);
         }
 
         function renderMovies(movies) {
             const container = document.getElementById('moviesContainer');
             container.innerHTML = '';
 
+            if(!movies || movies.length === 0) {
+                container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">No movies found.</p>';
+                return;
+            }
+
             movies.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'movie-card';
-                card.onclick = () => openModal(item.title, item.rating, item.release, item.overview, item.poster);
+                card.onclick = () => openModal(item.title, item.rating, item.year, item.desc, item.poster);
                 card.innerHTML = `
                     <img src="${item.poster}" alt="${item.title}" loading="lazy">
                     <div class="movie-info">
                         <h3>${item.title}</h3>
-                        <p>⭐ ${item.rating} | 📅 ${item.release}</p>
+                        <p>⭐ ${item.rating} | 📅 ${item.year}</p>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        async function performSearch() {
-            const query = document.getElementById('searchInput').value.trim();
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
             if (!query) return;
 
-            const container = document.getElementById('moviesContainer');
-            container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">Searching...</p>';
+            let allMovies = [];
+            Object.values(movieDatabase).forEach(list => allMovies.push(...list));
 
-            try {
-                const res = await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&s=${encodeURIComponent(query)}`);
-                const data = await res.json();
-                if (data.Response === "True" && data.Search) {
-                    renderMovies(data.Search.map(item => ({
-                        title: item.Title,
-                        release: item.Year,
-                        rating: "7.5",
-                        poster: item.Poster !== "N/A" ? item.Poster : "https://via.placeholder.com/300x450",
-                        overview: `Search result for ${item.Title}`
-                    })));
-                } else {
-                    container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">No movies found.</p>';
-                }
-            } catch (e) {
-                container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">Search failed. Please try again.</p>';
-            }
+            const filtered = allMovies.filter(m => m.title.toLowerCase().includes(query));
+            renderMovies(filtered);
         }
 
         function openModal(title, rating, release, overview, imgUrl) {
             document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalMeta').innerText = `⭐ Rating: ${rating} / 10 | 📅 Release: ${release}`;
-            document.getElementById('modalDesc').innerText = overview || 'No description available.';
+            document.getElementById('modalDesc').innerText = overview;
             document.getElementById('modalImg').src = imgUrl;
 
             document.getElementById('btnTrailer').href = `https://www.youtube.com/results?search_query=${encodeURIComponent(title + ' official trailer')}`;
