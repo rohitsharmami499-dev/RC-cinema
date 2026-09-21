@@ -56,10 +56,14 @@
 
     <header>
         <div class="logo">⚡ FlashInfo</div>
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search any movie or web series..." onkeyup="if(event.key === 'Enter') performSearch()">
-            <button onclick="performSearch()">Search</button>
-        </div>
+        <div class="search-container" style="position: relative;">
+    <input type="text" id="searchInput" placeholder="Search any movie or web series..." oninput="showSuggestions(this.value)" onkeyup="if(event.key === 'Enter') performSearch()">
+    <button onclick="performSearch()">Search</button>
+    
+    <!-- Suggestions List Box -->
+    <div id="suggestionsBox" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: #131c38; border: 1px solid #eab308; border-radius: 8px; max-height: 250px; overflow-y: auto; z-index: 1000; text-align: left; box-shadow: 0 8px 16px rgba(0,0,0,0.5);"></div>
+</div>
+
         <div class="nav-buttons">
             <button class="active" onclick="changeCategory('te', this)">Telugu</button>
             <button onclick="changeCategory('hi', this)">Hindi</button>
@@ -162,7 +166,7 @@
                 const release = item.release_date || item.first_air_date || 'N/A';
                 const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
                 
-                let rawPoster = item.poster_path ? `https://image.tmdb.org/t3/p/original${item.poster_path}` : null;
+                let rawPoster = item.poster_path ? `https://image.tmdb.org/t3/p/w500${item.poster_path}` : null;
 let poster = rawPoster 
     ? `https://images.weserv.nl/?url=${encodeURIComponent(rawPoster)}` 
     : `https://via.placeholder.com/500x750/1e293b/ffffff?text=${encodeURIComponent(title)}`;
@@ -242,6 +246,62 @@ let poster = rawPoster
 
         function closeModal() { document.getElementById('movieModal').style.display = 'none'; }
         window.onclick = function(e) { if (e.target === document.getElementById('movieModal')) closeModal(); }
+ let debounceTimer;
+
+async function showSuggestions(query) {
+    clearTimeout(debounceTimer);
+    const box = document.getElementById('suggestionsBox');
+    
+    if (!query || query.trim().length < 2) {
+        box.style.display = 'none';
+        return;
+    }
+
+    debounceTimer = setTimeout(async () => {
+        try {
+            const url = `${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=1`;
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            box.innerHTML = '';
+            if (data.results && data.results.length > 0) {
+                data.results.slice(0, 6).forEach(item => {
+                    const title = item.title || item.name;
+                    const year = (item.release_date || item.first_air_date || '').split('-')[0];
+                    if (!title) return;
+
+                    const div = document.createElement('div');
+                    div.style.cssText = 'padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #1e293b; color: #fff; font-size: 14px;';
+                    div.innerHTML = `<strong>${title}</strong> ${year ? `<span style="color: #94a3b8; font-size: 12px;">(${year})</span>` : ''}`;
+                    
+                    div.onclick = () => {
+                        document.getElementById('searchInput').value = title;
+                        box.style.display = 'none';
+                        performSearch();
+                    };
+                    div.onmouseover = () => div.style.background = '#253354';
+                    div.onmouseout = () => div.style.background = '#131c38';
+
+                    box.appendChild(div);
+                });
+                box.style.display = 'block';
+            } else {
+                box.style.display = 'none';
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }, 300);
+}
+
+document.addEventListener('click', function(e) {
+    const box = document.getElementById('suggestionsBox');
+    const input = document.getElementById('searchInput');
+    if (box && e.target !== input && !box.contains(e.target)) {
+        box.style.display = 'none';
+    }
+});
+
     </script>
 </body>
 </html>
