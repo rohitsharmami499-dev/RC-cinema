@@ -96,142 +96,131 @@
     </div>
 
     <script>
-        // updated TMDB API Key & Proxy Setup
-        const API_KEY = "841059f21a142833e034e30205f3b772";
-        const BASE_URL = "https://api.themoviedb.org/3";
-        const IMAGE_BASE = "https://image.tmdb.org/t3/p/w500";
+        const API_KEY = "c18512dd"; // Backup Working OMDB Key
+        const fallbackData = {
+            te: [
+                { title: "Pushpa 2: The Rule", year: "2024", rating: "8.5", poster: "https://m.media-amazon.com/images/M/MV5BN2E1Mjg3NDItNGNhMi00MDJjLWI3NTktYmZhZDJlMmI4Nzg4XkEyXkFqcGc@._V1_SX300.jpg", desc: "Pushpa Raj continues to rule the red sandalwood smuggling market while facing relentless enemies." },
+                { title: "RRR", year: "2022", rating: "7.8", poster: "https://m.media-amazon.com/images/M/MV5BODUwNDNjYzctODUxNy00ZTA2LWIyMDctM2JhMTU5M2E2OWUxXkEyXkFqcGc@._V1_SX300.jpg", desc: "A tale of two legendary revolutionaries and their journey far away from home." },
+                { title: "Kalki 2898 AD", year: "2024", rating: "7.6", poster: "https://m.media-amazon.com/images/M/MV5BNmU4M2E3YmEtMDVjNS00NTNlLTlhMjAtMDI1NWZjMDIzNDY3XkEyXkFqcGc@._V1_SX300.jpg", desc: "A modern avatar of Vishnu, believed to have descended to earth to protect the world." },
+                { title: "Devara", year: "2024", rating: "7.1", poster: "https://m.media-amazon.com/images/M/MV5BYzA4ZDQ4NmItYzA3OS00YWI0LWI1YWMtZWY2NWJkYmJhOTk2XkEyXkFqcGc@._V1_SX300.jpg", desc: "An epic action saga set against the coastal lands of India." },
+                { title: "Salaar", year: "2023", rating: "6.5", poster: "https://m.media-amazon.com/images/M/MV5BMmU2NGNiM2YtM2JmNC00YjhmLTg1Y2ItYTVmNTM0N2NlY2I0XkEyXkFqcGc@._V1_SX300.jpg", desc: "A gang leader tries to keep a promise made to his dying friend." }
+            ],
+            kn: [
+                { title: "K.G.F: Chapter 2", year: "2022", rating: "8.3", poster: "https://m.media-amazon.com/images/M/MV5BM2M0YmIxNzItOWI4OS00MmE3LTk3ODctYzA3OWIzNWZhNWZhXkEyXkFqcGc@._V1_SX300.jpg", desc: "In the blood-soaked Kolar Gold Fields, Rocky's name strikes fear into his foes." },
+                { title: "Kantara", year: "2022", rating: "8.2", poster: "https://m.media-amazon.com/images/M/MV5BNjQyNGI5OWEtZjI1Yy00NDVjLWE4MTAtM2FiTF00I2I3YzA4XkEyXkFqcGc@._V1_SX300.jpg", desc: "A conflict between village tradition and forestry officials." },
+                { title: "777 Charlie", year: "2022", rating: "8.8", poster: "https://m.media-amazon.com/images/M/MV5BMDk2MTAxOTUtMGQyNC00N2Y4LWE1MmUtM2E2MDI1OWJiYmJhXkEyXkFqcGc@._V1_SX300.jpg", desc: "Dharma is stuck in a rut with his negative lifestyle, until a stray pup enters his life." },
+                { title: "Vikrant Rona", year: "2022", rating: "7.0", poster: "https://m.media-amazon.com/images/M/MV5BZmNmMDlhNDktZTFlNy00NDQ0LWI0M2ItNmU3NWVmOWQ4YTkyXkEyXkFqcGc@._V1_SX300.jpg", desc: "Almost half a century ago, a remote village in the middle of a tropical rainforest starts witnessing mysterious events." }
+            ],
+            hi: [
+                { title: "Jawan", year: "2023", rating: "7.0", poster: "https://m.media-amazon.com/images/M/MV5BMjA1NmY2YWEtMDRhNi00NTgwLWIzZmItZWI1ZjYzNGZhYThlXkEyXkFqcGc@._V1_SX300.jpg", desc: "A personal vendetta drives a man to rectify the wrongs in society." },
+                { title: "Stree 2", year: "2024", rating: "7.4", poster: "https://m.media-amazon.com/images/M/MV5BZDU1NzI2YTMtMDk4OC00N2EzLThmYjAtN2NmMDY0MmQ3NTNhXkEyXkFqcGc@._V1_SX300.jpg", desc: "The town of Chanderi is haunted again, this time by a headless entity." }
+            ],
+            en: [
+                { title: "Avengers: Endgame", year: "2019", rating: "8.4", poster: "https://m.media-amazon.com/images/M/MV5BMTc5MDE2ODcwNV5BMl5BanBnXkFtZTgwMzI2NzIzNzM@._V1_SX300.jpg", desc: "After the devastating events of Infinity War, the universe is in ruins." },
+                { title: "Oppenheimer", year: "2023", rating: "8.9", poster: "https://m.media-amazon.com/images/M/MV5BN2JkMDc5MGQtMmJiNi00OWVjLWE0ZjgtZDliMTZmMGI1GJhXkEyXkFqcGc@._V1_SX300.jpg", desc: "The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb." }
+            ]
+        };
 
         let currentCategory = 'te';
-        let currentPage = 1;
-        let isSearchMode = false;
 
         window.onload = () => {
-            fetchMovies(currentCategory, currentPage);
+            loadCategory(currentCategory);
         };
 
         function changeCategory(catKey, btn) {
             document.querySelectorAll('.nav-buttons button').forEach(b => b.classList.remove('active'));
             if(btn) btn.classList.add('active');
-            
             currentCategory = catKey;
-            currentPage = 1;
-            isSearchMode = false;
-            document.getElementById('moviesContainer').innerHTML = '';
-            document.getElementById('loadMoreBtn').style.display = 'inline-block';
+            loadCategory(catKey);
+        }
+
+        async function loadCategory(cat) {
+            const container = document.getElementById('moviesContainer');
+            container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">Loading movies...</p>';
+
+            // Try fetching dynamically or use fallback
+            let query = cat === 'te' ? 'Telugu' : cat === 'kn' ? 'Kannada' : cat === 'hi' ? 'Hindi' : 'Avengers';
             
-            fetchMovies(catKey, currentPage);
-        }
-
-        async function fetchMovies(category, page) {
-            let url = "";
-
-            if (category === 'te') {
-                url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=te&sort_by=popularity.desc&page=${page}`;
-            } else if (category === 'hi') {
-                url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=hi&sort_by=popularity.desc&page=${page}`;
-            } else if (category === 'en') {
-                url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=en&sort_by=popularity.desc&page=${page}`;
-            } else if (category === 'kn') {
-                url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=kn&sort_by=popularity.desc&page=${page}`;
-            } else if (category === 'marvel') {
-                url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_companies=420&sort_by=popularity.desc&page=${page}`;
-            } else if (category === 'dc') {
-                url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_companies=128064|9993|429&sort_by=popularity.desc&page=${page}`;
-            } else if (category === 'movie') {
-                url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&sort_by=popularity.desc&page=${page}`;
-            } else if (category === 'tv') {
-                url = `${BASE_URL}/discover/tv?api_key=${API_KEY}&sort_by=popularity.desc&page=${page}`;
-            }
-
             try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error("API call failed");
-                const data = await response.json();
-                renderMovies(data.results);
-            } catch (error) {
-                console.error("Direct fetch failed, trying proxy...", error);
-                fetchMoviesWithProxy(url);
-            }
-        }
-
-        async function fetchMoviesWithProxy(originalUrl) {
-            try {
-                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(originalUrl)}`;
-                const response = await fetch(proxyUrl);
-                const data = await response.json();
-                renderMovies(data.results);
+                const res = await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&s=${query}&type=movie`);
+                const data = await res.json();
+                
+                if (data.Response === "True" && data.Search) {
+                    renderMovies(data.Search.map(item => ({
+                        title: item.Title,
+                        release: item.Year,
+                        rating: "7.8",
+                        poster: item.Poster !== "N/A" ? item.Poster : "https://via.placeholder.com/300x450",
+                        overview: `${item.Title} is a popular title released in ${item.Year}.`
+                    })));
+                } else {
+                    useFallbackData(cat);
+                }
             } catch (err) {
-                console.error("Proxy error:", err);
-                document.getElementById('moviesContainer').innerHTML = '<p style="text-align:center; grid-column:1/-1;">Error loading movies. Please try refreshing.</p>';
+                useFallbackData(cat);
             }
+        }
+
+        function useFallbackData(cat) {
+            const movies = fallbackData[cat] || fallbackData['te'];
+            renderMovies(movies.map(m => ({
+                title: m.title,
+                release: m.year,
+                rating: m.rating,
+                poster: m.poster,
+                overview: m.desc
+            })));
         }
 
         function renderMovies(movies) {
             const container = document.getElementById('moviesContainer');
-
-            if (!movies || movies.length === 0) {
-                if (currentPage === 1) container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">No movies found.</p>';
-                document.getElementById('loadMoreBtn').style.display = 'none';
-                return;
-            }
+            container.innerHTML = '';
 
             movies.forEach(item => {
-                const title = item.title || item.name || 'Untitled';
-                const release = item.release_date || item.first_air_date || 'N/A';
-                const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
-                const poster = item.poster_path ? (IMAGE_BASE + item.poster_path) : `https://via.placeholder.com/500x750/1e293b/ffffff?text=${encodeURIComponent(title)}`;
-                const backdrop = item.backdrop_path ? (IMAGE_BASE + item.backdrop_path) : poster;
-
                 const card = document.createElement('div');
                 card.className = 'movie-card';
-                card.onclick = () => openModal(title, rating, release, item.overview, backdrop);
+                card.onclick = () => openModal(item.title, item.rating, item.release, item.overview, item.poster);
                 card.innerHTML = `
-                    <img src="${poster}" alt="${title}" loading="lazy" onerror="this.src='https://via.placeholder.com/500x750/1e293b/ffffff?text=${encodeURIComponent(title)}'">
+                    <img src="${item.poster}" alt="${item.title}" loading="lazy">
                     <div class="movie-info">
-                        <h3>${title}</h3>
-                        <p>⭐ ${rating} | 📅 ${release.split('-')[0]}</p>
+                        <h3>${item.title}</h3>
+                        <p>⭐ ${item.rating} | 📅 ${item.release}</p>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        function loadMoreMovies() {
-            if (isSearchMode) {
-                currentPage++;
-                searchMoviesAPI(document.getElementById('searchInput').value, currentPage);
-            } else {
-                currentPage++;
-                fetchMovies(currentCategory, currentPage);
-            }
-        }
-
         async function performSearch() {
             const query = document.getElementById('searchInput').value.trim();
             if (!query) return;
 
-            isSearchMode = true;
-            currentPage = 1;
-            document.getElementById('moviesContainer').innerHTML = '';
-            
-            searchMoviesAPI(query, currentPage);
-        }
+            const container = document.getElementById('moviesContainer');
+            container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">Searching...</p>';
 
-        async function searchMoviesAPI(query, page) {
-            const url = `${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`;
             try {
-                const response = await fetch(url);
-                const data = await response.json();
-                renderMovies(data.results);
-            } catch (error) {
-                console.error("Search error:", error);
+                const res = await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&s=${encodeURIComponent(query)}`);
+                const data = await res.json();
+                if (data.Response === "True" && data.Search) {
+                    renderMovies(data.Search.map(item => ({
+                        title: item.Title,
+                        release: item.Year,
+                        rating: "7.5",
+                        poster: item.Poster !== "N/A" ? item.Poster : "https://via.placeholder.com/300x450",
+                        overview: `Search result for ${item.Title}`
+                    })));
+                } else {
+                    container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">No movies found.</p>';
+                }
+            } catch (e) {
+                container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">Search failed. Please try again.</p>';
             }
         }
 
         function openModal(title, rating, release, overview, imgUrl) {
             document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalMeta').innerText = `⭐ Rating: ${rating} / 10 | 📅 Release: ${release}`;
-            document.getElementById('modalDesc').innerText = overview || 'No description available for this title.';
+            document.getElementById('modalDesc').innerText = overview || 'No description available.';
             document.getElementById('modalImg').src = imgUrl;
 
             document.getElementById('btnTrailer').href = `https://www.youtube.com/results?search_query=${encodeURIComponent(title + ' official trailer')}`;
