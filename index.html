@@ -41,7 +41,6 @@
             gap: 6px;
             max-width: 450px;
             margin: 0 auto 15px auto;
-            position: relative;
         }
 
         .search-container input {
@@ -62,33 +61,6 @@
             color: #0f172a;
             font-weight: bold;
             cursor: pointer;
-        }
-
-        .suggestions-box {
-            position: absolute;
-            top: 40px;
-            left: 5%;
-            width: 70%;
-            background: #1e293b;
-            border-radius: 4px;
-            max-height: 250px;
-            overflow-y: auto;
-            z-index: 1000;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            text-align: left;
-        }
-
-        .suggestion-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px;
-            cursor: pointer;
-            border-bottom: 1px solid #334155;
-        }
-
-        .suggestion-item:hover {
-            background: #334155;
         }
 
         .nav-buttons {
@@ -160,7 +132,8 @@
             background: #131c38;
             border-radius: 8px;
             overflow: hidden;
-            cursor: pointer;
+            text-align: center;
+            padding-bottom: 10px;
         }
 
         .movie-card img {
@@ -186,7 +159,6 @@
             margin-top: 4px;
         }
 
-        /* Games Section Styling */
         .games-section {
             padding: 20px;
             text-align: center;
@@ -236,9 +208,8 @@
     <header>
         <div class="logo">⚡ FlashInfo</div>
         <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search Movies or Web Series..." oninput="handleSearchInput(this.value)">
+            <input type="text" id="searchInput" placeholder="Search Movies or Web Series...">
             <button onclick="performSearch()">Search</button>
-            <div id="suggestionsBox" class="suggestions-box"></div>
         </div>
         <div class="nav-buttons">
             <button onclick="filterCategory('movie')">🎬 Movies</button>
@@ -257,59 +228,64 @@
         <a href="https://m.cricbuzz.com/cricket-match/live-scores" target="_blank" class="btn-live">View Live Scores & Updates 🚀</a>
     </div>
 
-    <!-- Content Areas -->
     <div id="moviesContainer" class="movies-grid"></div>
     <div id="gamesContainer" class="games-section" style="display:none;"></div>
 
     <script>
-        const API_KEY = '59973be85848763e326b1c3ef9461129';
-        const BASE_URL = 'https://api.themoviedb.org/3';
-        const IMG_URL = 'https://image.tmdb.org/t3/p/w500';
+        // Sample Movies & Web Series Data (Fallback System)
+        const mediaData = {
+            te: [
+                { title: "Kalki 2898 AD", rating: "8.5", date: "2024", img: "https://image.tmdb.org/t3/p/w500/1X64hN6gVlI0D9E0eT9lFp7uL0J.jpg" },
+                { title: "Devara", rating: "8.1", date: "2024", img: "https://image.tmdb.org/t3/p/w500/A68nZ5mI6i5FzY2M8u2L8R3p0P.jpg" },
+                { title: "Pushpa 2", rating: "8.9", date: "2024", img: "https://image.tmdb.org/t3/p/w500/A2nZ5mI6i5FzY2M8u2L8R3p0P.jpg" },
+                { title: "Salaar", rating: "8.3", date: "2023", img: "https://image.tmdb.org/t3/p/w500/2L8R3p0P1X64hN6gVlI0D9E0eT.jpg" }
+            ],
+            hi: [
+                { title: "Jawan", rating: "8.2", date: "2023", img: "https://image.tmdb.org/t3/p/w500/iA4iI9vL2Y3QzI2l7A8fE4r0M.jpg" },
+                { title: "Stree 2", rating: "8.4", date: "2024", img: "https://image.tmdb.org/t3/p/w500/8R3p0P1X64hN6gVlI0D9E0eT9.jpg" },
+                { title: "Pathaan", rating: "7.9", date: "2023", img: "https://image.tmdb.org/t3/p/w500/a2zX9M3N8P2L0K1J2H3G4F5E6.jpg" }
+            ],
+            en: [
+                { title: "Avatar 2", rating: "8.8", date: "2022", img: "https://image.tmdb.org/t3/p/w500/t6HIqrRAOXZM23321A8fE4r0M.jpg" },
+                { title: "Oppenheimer", rating: "8.9", date: "2023", img: "https://image.tmdb.org/t3/p/w500/8Gxv8K8A2a2C1B2d3E4f5G6h7.jpg" }
+            ],
+            kn: [
+                { title: "KGF Chapter 2", rating: "9.0", date: "2022", img: "https://image.tmdb.org/t3/p/w500/q2Z9M3N8P2L0K1J2H3G4F5E6a.jpg" },
+                { title: "Kantara", rating: "8.8", date: "2022", img: "https://image.tmdb.org/t3/p/w500/3Z9M3N8P2L0K1J2H3G4F5E6a1.jpg" }
+            ]
+        };
 
-        let currentType = 'movie';
         let currentLang = 'te';
 
         window.onload = () => {
-            fetchContent();
+            renderMovies();
         };
 
-        async function fetchContent() {
+        function renderMovies(list = null) {
             document.getElementById("gamesContainer").style.display = "none";
             document.getElementById("sportsBanner").style.display = "block";
-            const moviesCont = document.getElementById("moviesContainer");
-            moviesCont.style.display = "grid";
-            moviesCont.innerHTML = '<p style="text-align:center; grid-column:1/-1;">Loading movies...</p>';
+            const container = document.getElementById("moviesContainer");
+            container.style.display = "grid";
+            container.innerHTML = '';
 
-            // Try language based fetch first
-            let url = `${BASE_URL}/discover/${currentType}?api_key=${API_KEY}&with_original_language=${currentLang}&sort_by=popularity.desc`;
+            const items = list || mediaData[currentLang] || mediaData['te'];
 
-            try {
-                let res = await fetch(url);
-                let data = await res.json();
-                
-                // If language list is empty, load standard popular items
-                if (!data.results || data.results.length === 0) {
-                    url = `${BASE_URL}/${currentType}/popular?api_key=${API_KEY}`;
-                    res = await fetch(url);
-                    data = await res.json();
-                }
-
-                displayItems(data.results);
-            } catch (err) {
-                // Guaranteed fallback
-                try {
-                    let res = await fetch(`${BASE_URL}/${currentType}/popular?api_key=${API_KEY}`);
-                    let data = await res.json();
-                    displayItems(data.results);
-                } catch(e) {
-                    moviesCont.innerHTML = '<p style="color:red; text-align:center; grid-column:1/-1;">Error loading data!</p>';
-                }
-            }
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'movie-card';
+                card.innerHTML = `
+                    <img src="${item.img}" onerror="this.src='https://via.placeholder.com/150x220?text=Movie'" alt="${item.title}">
+                    <div class="movie-info">
+                        <h3>${item.title}</h3>
+                        <p>⭐ ${item.rating} | 📅 ${item.date}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
         }
 
         function filterCategory(type) {
-            currentType = type;
-            fetchContent();
+            renderMovies();
         }
 
         function filterLanguage(lang, btn) {
@@ -318,71 +294,18 @@
                 btn.classList.add('active');
             }
             currentLang = lang;
-            fetchContent();
-        }
-
-        function displayItems(items) {
-            const container = document.getElementById('moviesContainer');
-            container.innerHTML = '';
-
-            if (!items || items.length === 0) {
-                container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">No content found.</p>';
-                return;
-            }
-
-            items.forEach(item => {
-                const title = item.title || item.name;
-                const release = item.release_date || item.first_air_date || 'N/A';
-                const card = document.createElement('div');
-                card.className = 'movie-card';
-                card.innerHTML = `
-                    <img src="${item.poster_path ? IMG_URL + item.poster_path : 'https://via.placeholder.com/500x750?text=No+Poster'}" alt="${title}">
-                    <div class="movie-info">
-                        <h3>${title}</h3>
-                        <p>⭐ ${item.vote_average ? item.vote_average.toFixed(1) : 'N/A'} | 📅 ${release}</p>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // Live Search
-        async function handleSearchInput(query) {
-            const box = document.getElementById('suggestionsBox');
-            if (!query || query.trim().length < 2) {
-                box.innerHTML = '';
-                return;
-            }
-
-            try {
-                const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
-                const data = await res.json();
-                const filtered = (data.results || []).slice(0, 5);
-                
-                box.innerHTML = '';
-                filtered.forEach(item => {
-                    const title = item.title || item.name;
-                    if (!title) return;
-                    const div = document.createElement('div');
-                    div.className = 'suggestion-item';
-                    div.innerHTML = `<span>${title}</span>`;
-                    div.onclick = () => {
-                        displayItems([item]);
-                        box.innerHTML = '';
-                    };
-                    box.appendChild(div);
-                });
-            } catch(e) {
-                box.innerHTML = '';
-            }
+            renderMovies();
         }
 
         function performSearch() {
-            const query = document.getElementById('searchInput').value;
-            if(query) handleSearchInput(query);
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            if (!query) return;
+            const currentList = mediaData[currentLang] || mediaData['te'];
+            const filtered = currentList.filter(m => m.title.toLowerCase().includes(query));
+            renderMovies(filtered.length ? filtered : currentList);
         }
 
-        // --- MULTIPLE GAMES SECTION ---
+        // --- GAMES HUB ---
         function showGamesSection() {
             document.getElementById("moviesContainer").style.display = "none";
             document.getElementById("sportsBanner").style.display = "none";
@@ -391,7 +314,7 @@
             
             gamesCont.innerHTML = `
                 <h2>🎮 Free Games Hub</h2>
-                <p style="color:#94a3b8; margin-bottom:15px;">Select a game to play directly!</p>
+                <p style="color:#94a3b8; margin-bottom:15px;">Game ఎంచుకుని ఆడండి!</p>
                 <div class="games-menu">
                     <button onclick="loadTicTacToe()">❌ Tic Tac Toe</button>
                     <button onclick="loadRPS()">✂️ Rock Paper Scissors</button>
@@ -402,21 +325,25 @@
             loadTicTacToe();
         }
 
-        // Game 1: Tic Tac Toe
+        // Tic Tac Toe Game
         let board = ["", "", "", "", "", "", "", "", ""];
         let currentPlayer = "❌";
 
         function loadTicTacToe() {
             board = ["", "", "", "", "", "", "", "", ""];
             currentPlayer = "❌";
+            updateBoard();
+        }
+
+        function updateBoard() {
             const area = document.getElementById("activeGameArea");
             area.innerHTML = `
                 <h3>Tic Tac Toe</h3>
-                <p id="gameStatus" style="margin-top:5px;">Turn: ${currentPlayer}</p>
+                <p style="margin-top:5px;">Turn: ${currentPlayer}</p>
                 <div class="game-board">
                     ${board.map((val, idx) => `<div class="cell" onclick="makeMove(${idx})">${val}</div>`).join('')}
                 </div>
-                <button onclick="loadTicTacToe()" style="padding:6px 12px; background:#eab308; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">Restart</button>
+                <button onclick="loadTicTacToe()" style="padding:6px 12px; background:#eab308; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">Restart Game</button>
             `;
         }
 
@@ -424,31 +351,19 @@
             if (board[index] !== "") return;
             board[index] = currentPlayer;
             currentPlayer = currentPlayer === "❌" ? "⭕" : "❌";
-            loadTicTacToeView();
+            updateBoard();
         }
 
-        function loadTicTacToeView() {
-            const area = document.getElementById("activeGameArea");
-            area.innerHTML = `
-                <h3>Tic Tac Toe</h3>
-                <p id="gameStatus" style="margin-top:5px;">Turn: ${currentPlayer}</p>
-                <div class="game-board">
-                    ${board.map((val, idx) => `<div class="cell" onclick="makeMove(${idx})">${val}</div>`).join('')}
-                </div>
-                <button onclick="loadTicTacToe()" style="padding:6px 12px; background:#eab308; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">Restart</button>
-            `;
-        }
-
-        // Game 2: Rock Paper Scissors
+        // Rock Paper Scissors Game
         function loadRPS() {
             const area = document.getElementById("activeGameArea");
             area.innerHTML = `
                 <h3>Rock Paper Scissors</h3>
-                <p style="margin:10px 0;">Choose your move:</p>
-                <div style="display:flex; justify-center; gap:10px;">
-                    <button onclick="playRPS('✊')" style="font-size:24px; padding:10px;">✊</button>
-                    <button onclick="playRPS('✋')" style="font-size:24px; padding:10px;">✋</button>
-                    <button onclick="playRPS('✌️')" style="font-size:24px; padding:10px;">✌️</button>
+                <p style="margin:10px 0;">మీ ఆప్షన్ ఎంచుకోండి:</p>
+                <div style="display:flex; justify-content:center; gap:10px;">
+                    <button onclick="playRPS('✊')" style="font-size:24px; padding:10px; cursor:pointer;">✊</button>
+                    <button onclick="playRPS('✋')" style="font-size:24px; padding:10px; cursor:pointer;">✋</button>
+                    <button onclick="playRPS('✌️')" style="font-size:24px; padding:10px; cursor:pointer;">✌️</button>
                 </div>
                 <div id="rpsResult" style="margin-top:15px; font-size:16px;"></div>
             `;
@@ -469,7 +384,7 @@
             document.getElementById("rpsResult").innerHTML = `You: ${userChoice} vs Comp: ${compChoice}<br><b>${res}</b>`;
         }
 
-        // Game 3: Number Guessing
+        // Number Guessing Game
         let targetNum = Math.floor(Math.random() * 20) + 1;
         function loadGuessNum() {
             targetNum = Math.floor(Math.random() * 20) + 1;
@@ -478,7 +393,7 @@
                 <h3>Guess Number (1 to 20)</h3>
                 <div style="margin:15px 0;">
                     <input type="number" id="numInput" placeholder="Enter 1-20" style="padding:6px; width:100px; text-align:center;">
-                    <button onclick="checkGuess()" style="padding:6px 12px; background:#eab308; border:none; border-radius:4px; font-weight:bold;">Guess</button>
+                    <button onclick="checkGuess()" style="padding:6px 12px; background:#eab308; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">Guess</button>
                 </div>
                 <div id="guessResult"></div>
             `;
