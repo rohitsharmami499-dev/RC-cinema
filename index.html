@@ -6,41 +6,48 @@
     <title>FlashInfo - Unlimited Movies & Web Series</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #0b1329; color: #ffffff; }
-        header { background: #131c38; padding: 15px; text-align: center; border-bottom: 2px solid #eab308; position: sticky; top: 0; z-index: 100; }
-        .logo { font-size: 28px; font-weight: 800; color: #eab308; margin-bottom: 12px; }
+        body { background-color: #0b1329; color: #ffffff; min-height: 100vh; }
         
-        .search-container { display: flex; justify-content: center; gap: 6px; max-width: 450px; margin: 0 auto 15px auto; }
-        .search-container input { width: 75%; padding: 10px 14px; border-radius: 6px; border: 1px solid #334155; outline: none; font-size: 14px; color: #000; }
-        .search-container button { padding: 10px 16px; border-radius: 6px; border: none; background: #eab308; color: #0f172a; font-weight: bold; cursor: pointer; }
+        header { background: #131c38; padding: 15px; text-align: center; border-bottom: 2px solid #eab308; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .logo { font-size: 28px; font-weight: 800; color: #eab308; margin-bottom: 12px; letter-spacing: 1px; }
         
-        .nav-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 700px; margin: 0 auto; }
-        .nav-buttons button { background: #253354; color: #ffffff; border: none; padding: 8px 16px; border-radius: 18px; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; }
-        .nav-buttons button.active { background: #eab308; color: #000000; }
+        .search-container { display: flex; justify-content: center; gap: 8px; max-width: 480px; margin: 0 auto 15px auto; }
+        .search-container input { width: 75%; padding: 11px 16px; border-radius: 20px; border: 1px solid #334155; outline: none; font-size: 14px; background: #0b1329; color: #fff; }
+        .search-container button { padding: 11px 20px; border-radius: 20px; border: none; background: #eab308; color: #0f172a; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .search-container button:hover { background: #facc15; }
+        
+        .nav-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 800px; margin: 0 auto; }
+        .nav-buttons button { background: #253354; color: #ffffff; border: 1px solid #334155; padding: 8px 16px; border-radius: 18px; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; }
+        .nav-buttons button:hover { background: #334155; }
+        .nav-buttons button.active { background: #eab308; color: #000000; border-color: #eab308; font-weight: bold; }
 
-        .sports-banner { background: #111a33; border: 1px solid #1e293b; border-radius: 12px; padding: 15px; margin: 15px; text-align: center; }
+        .sports-banner { background: linear-gradient(135deg, #111a33 0%, #1e293b 100%); border: 1px solid #1e293b; border-radius: 12px; padding: 15px; margin: 15px; text-align: center; }
         .sports-banner h3 { color: #38bdf8; font-size: 15px; margin-bottom: 6px; }
         .sports-banner p { color: #94a3b8; font-size: 12px; margin-bottom: 12px; }
-        .sports-banner .btn-live { background: #00d2ff; color: #000000; text-decoration: none; font-weight: bold; padding: 8px 16px; border-radius: 6px; display: inline-block; font-size: 13px; }
+        .sports-banner .btn-live { background: #00d2ff; color: #000000; text-decoration: none; font-weight: bold; padding: 8px 18px; border-radius: 20px; display: inline-block; font-size: 13px; }
 
         .movies-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; padding: 15px; }
-        .movie-card { background: #131c38; border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s; border: 1px solid #1e293b; }
-        .movie-card:hover { transform: translateY(-4px); }
-        .movie-card img { width: 100%; height: 210px; object-fit: cover; display: block; }
-        .movie-info { padding: 8px; }
-        .movie-info h3 { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ffffff; }
-        .movie-info p { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+        .movie-card { background: #131c38; border-radius: 10px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; border: 1px solid #1e293b; display: flex; flex-direction: column; }
+        .movie-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.6); }
+        .movie-card img { width: 100%; height: 210px; object-fit: cover; display: block; background-color: #1e293b; }
+        .movie-info { padding: 10px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .movie-info h3 { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ffffff; margin-bottom: 4px; }
+        .movie-info p { font-size: 11px; color: #94a3b8; }
+
+        .load-more-box { text-align: center; margin: 25px 0 45px 0; }
+        .btn-load-more { background: #eab308; color: #0f172a; border: none; padding: 12px 30px; border-radius: 25px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(234, 179, 8, 0.3); }
+        .btn-load-more:hover { background: #facc15; transform: scale(1.05); }
 
         /* Modal Popup */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; justify-content: center; align-items: center; padding: 15px; }
-        .modal-content { background: #131c38; border-radius: 12px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; padding: 20px; border: 1px solid #eab308; }
-        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 24px; color: #ffffff; cursor: pointer; }
-        .modal-img { width: 100%; height: 230px; object-fit: cover; border-radius: 8px; margin-bottom: 15px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.88); z-index: 2000; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(4px); }
+        .modal-content { background: #131c38; border-radius: 12px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; padding: 20px; border: 1px solid #eab308; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .close-btn { position: absolute; top: 12px; right: 16px; font-size: 26px; color: #ffffff; cursor: pointer; }
+        .modal-img { width: 100%; height: 240px; object-fit: cover; border-radius: 8px; margin-bottom: 15px; }
         .modal-title { font-size: 20px; color: #eab308; margin-bottom: 8px; }
         .modal-meta { font-size: 12px; color: #94a3b8; margin-bottom: 12px; }
-        .modal-desc { font-size: 13px; line-height: 1.5; margin-bottom: 15px; color: #cbd5e1; }
+        .modal-desc { font-size: 13px; line-height: 1.6; margin-bottom: 18px; color: #cbd5e1; }
         .modal-actions { display: flex; flex-direction: column; gap: 10px; }
-        .btn-action { display: block; text-align: center; padding: 10px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; }
+        .btn-action { display: block; text-align: center; padding: 11px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; }
         .btn-trailer { background: #ff0000; color: #ffffff; }
         .btn-watch { background: #00d2ff; color: #000000; }
     </style>
@@ -54,12 +61,12 @@
             <button onclick="performSearch()">Search</button>
         </div>
         <div class="nav-buttons">
-            <button onclick="changeCategory('movie', this)">🎬 Movies</button>
-            <button onclick="changeCategory('tv', this)">📺 Web Series</button>
             <button class="active" onclick="changeCategory('te', this)">Telugu</button>
             <button onclick="changeCategory('hi', this)">Hindi</button>
             <button onclick="changeCategory('en', this)">English</button>
             <button onclick="changeCategory('kn', this)">Kannada</button>
+            <button onclick="changeCategory('movie', this)">🎬 Movies</button>
+            <button onclick="changeCategory('tv', this)">📺 Web Series</button>
             <button onclick="changeCategory('marvel', this)">🦸 Marvel</button>
             <button onclick="changeCategory('dc', this)">🦇 DC Studio</button>
         </div>
@@ -72,6 +79,10 @@
     </div>
 
     <div id="moviesContainer" class="movies-grid"></div>
+
+    <div class="load-more-box">
+        <button id="loadMoreBtn" class="btn-load-more" onclick="loadMoreMovies()">Load More Movies 🔄</button>
+    </div>
 
     <!-- Movie Details Popup -->
     <div id="movieModal" class="modal">
@@ -86,106 +97,147 @@
                 <a id="btnWatch" class="btn-action btn-watch" target="_blank">🔍 Where to Watch / Stream</a>
             </div>
         </div>
-    </div>
+    </header>
 
     <script>
-        // Offline Built-in Database to prevent API blocking
-        const movieDatabase = {
-            te: [
-                { title: "Pushpa 2: The Rule", year: "2024", rating: "8.8", poster: "https://m.media-amazon.com/images/M/MV5BN2E1Mjg3NDItNGNhMi00MDJjLWI3NTktYmZhZDJlMmI4Nzg4XkEyXkFqcGc@._V1_SX300.jpg", desc: "Pushpa Raj continues to rule the red sandalwood smuggling market while facing relentless enemies." },
-                { title: "RRR", year: "2022", rating: "7.8", poster: "https://m.media-amazon.com/images/M/MV5BODUwNDNjYzctODUxNy00ZTA2LWIyMDctM2JhMTU5M2E2OWUxXkEyXkFqcGc@._V1_SX300.jpg", desc: "A tale of two legendary revolutionaries and their journey far away from home." },
-                { title: "Kalki 2898 AD", year: "2024", rating: "7.6", poster: "https://m.media-amazon.com/images/M/MV5BNmU4M2E3YmEtMDVjNS00NTNlLTlhMjAtMDI1NWZjMDIzNDY3XkEyXkFqcGc@._V1_SX300.jpg", desc: "A modern avatar of Vishnu, believed to have descended to earth to protect the world." },
-                { title: "Devara: Part 1", year: "2024", rating: "7.1", poster: "https://m.media-amazon.com/images/M/MV5BYzA4ZDQ4NmItYzA3OS00YWI0LWI1YWMtZWY2NWJkYmJhOTk2XkEyXkFqcGc@._V1_SX300.jpg", desc: "An epic action saga set against the coastal lands of India." },
-                { title: "Salaar: Ceasefire", year: "2023", rating: "6.5", poster: "https://m.media-amazon.com/images/M/MV5BMmU2NGNiM2YtM2JmNC00YjhmLTg1Y2ItYTVmNTM0N2NlY2I0XkEyXkFqcGc@._V1_SX300.jpg", desc: "A gang leader tries to keep a promise made to his dying friend." },
-                { title: "Guntur Kaaram", year: "2024", rating: "6.2", poster: "https://m.media-amazon.com/images/M/MV5BZDQwZmE2MzYtN2E0NC00M2E1LTg3MDUtMDNlM2NmMWJhMzI3XkEyXkFqcGc@._V1_SX300.jpg", desc: "An action drama revolving around the king of the underworld in Guntur." }
-            ],
-            kn: [
-                { title: "K.G.F: Chapter 2", year: "2022", rating: "8.3", poster: "https://m.media-amazon.com/images/M/MV5BM2M0YmIxNzItOWI4OS00MmE3LTk3ODctYzA3OWIzNWZhNWZhXkEyXkFqcGc@._V1_SX300.jpg", desc: "In the blood-soaked Kolar Gold Fields, Rocky's name strikes fear into his foes." },
-                { title: "Kantara", year: "2022", rating: "8.2", poster: "https://m.media-amazon.com/images/M/MV5BNjQyNGI5OWEtZjI1Yy00NDVjLWE4MTAtM2FiTF00I2I3YzA4XkEyXkFqcGc@._V1_SX300.jpg", desc: "A conflict between village tradition and forestry officials." },
-                { title: "777 Charlie", year: "2022", rating: "8.8", poster: "https://m.media-amazon.com/images/M/MV5BMDk2MTAxOTUtMGQyNC00N2Y4LWE1MmUtM2E2MDI1OWJiYmJhXkEyXkFqcGc@._V1_SX300.jpg", desc: "Dharma is stuck in a rut with his negative lifestyle, until a stray pup enters his life." },
-                { title: "Vikrant Rona", year: "2022", rating: "7.0", poster: "https://m.media-amazon.com/images/M/MV5BZmNmMDlhNDktZTFlNy00NDQ0LWI0M2ItNmU3NWVmOWQ4YTkyXkEyXkFqcGc@._V1_SX300.jpg", desc: "A remote village starts witnessing mysterious events." }
-            ],
-            hi: [
-                { title: "Jawan", year: "2023", rating: "7.0", poster: "https://m.media-amazon.com/images/M/MV5BMjA1NmY2YWEtMDRhNi00NTgwLWIzZmItZWI1ZjYzNGZhYThlXkEyXkFqcGc@._V1_SX300.jpg", desc: "A personal vendetta drives a man to rectify the wrongs in society." },
-                { title: "Stree 2", year: "2024", rating: "7.4", poster: "https://m.media-amazon.com/images/M/MV5BZDU1NzI2YTMtMDk4OC00N2EzLThmYjAtN2NmMDY0MmQ3NTNhXkEyXkFqcGc@._V1_SX300.jpg", desc: "The town of Chanderi is haunted again by a headless entity." },
-                { title: "Pathaan", year: "2023", rating: "5.9", poster: "https://m.media-amazon.com/images/M/MV5BM2QzM2JiNTMtOWM4NC00NmFlLTg2NWUtM2NmNDQ1YTIxOGU3XkEyXkFqcGc@._V1_SX300.jpg", desc: "An Indian agent battles against a mercenary group leader." }
-            ],
-            en: [
-                { title: "Avengers: Endgame", year: "2019", rating: "8.4", poster: "https://m.media-amazon.com/images/M/MV5BMTc5MDE2ODcwNV5BMl5BanBnXkFtZTgwMzI2NzIzNzM@._V1_SX300.jpg", desc: "After the devastating events of Infinity War, the universe is in ruins." },
-                { title: "Oppenheimer", year: "2023", rating: "8.9", poster: "https://m.media-amazon.com/images/M/MV5BN2JkMDc5MGQtMmJiNi00OWVjLWE0ZjgtZDliMTZmMGI1GJhXkEyXkFqcGc@._V1_SX300.jpg", desc: "The story of American scientist J. Robert Oppenheimer and the atomic bomb." },
-                { title: "Avatar: The Way of Water", year: "2022", rating: "7.6", poster: "https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctMzE0NC00ODBhLWFmMGItYzViNWU4MmJiEFlXkEyXkFqcGc@._V1_SX300.jpg", desc: "Jake Sully lives with his newfound family formed on the home planet of Pandora." }
-            ],
-            marvel: [
-                { title: "Deadpool & Wolverine", year: "2024", rating: "7.8", poster: "https://m.media-amazon.com/images/M/MV5BNzRiMjg0MzUtNTZmMi00M2M5LWEyYjMtMzA5MzUxM2YyNWJiXkEyXkFqcGc@._V1_SX300.jpg", desc: "Deadpool is offered a place in the Marvel Cinematic Universe." },
-                { title: "Spider-Man: No Way Home", year: "2021", rating: "8.2", poster: "https://m.media-amazon.com/images/M/MV5BZWMyYzFjYTYtNTRjYi00OGExLWE2YzgtOGRmYjAxZTU3NzBiXkEyXkFqcGc@._V1_SX300.jpg", desc: "With Spider-Man's identity revealed, Peter asks Doctor Strange for help." }
-            ],
-            dc: [
-                { title: "The Batman", year: "2022", rating: "7.8", poster: "https://m.media-amazon.com/images/M/MV5BMDdmMTBiNTYtMDIzNi00NGVlLWIzMDYtZTk3MTQ3NGQxU2FlXkEyXkFqcGc@._V1_SX300.jpg", desc: "When a sadistic serial killer begins murdering key political figures in Gotham." },
-                { title: "Joker", year: "2019", rating: "8.4", poster: "https://m.media-amazon.com/images/M/MV5BNGVjNWI4ZGUtNzE0MS00YTJmLWE0ZDctN2ZiYTk2YmI3NTYyXkEyXkFqcGc@._V1_SX300.jpg", desc: "Arthur Fleck, a party clown, leads a downward spiral into revolution." }
-            ],
-            tv: [
-                { title: "Stranger Things", year: "2016-", rating: "8.7", poster: "https://m.media-amazon.com/images/M/MV5BM2M1MmVhNDgtNmI0MS00ZDNmLThlOWUtNDJiN2ZkNzA3NzUxXkEyXkFqcGc@._V1_SX300.jpg", desc: "When a young boy vanishes, a small town uncovers a mystery involving secret experiments." },
-                { title: "Panchayat", year: "2020-", rating: "8.9", poster: "https://m.media-amazon.com/images/M/MV5BMTI5M2MyZjEtNTdhYi00MDllLWI3NTktMTI2NzExM2RjMWI2XkEyXkFqcGc@._V1_SX300.jpg", desc: "A comedy-drama, which captures the journey of an engineering graduate." },
-                { title: "The Family Man", year: "2019-", rating: "8.7", poster: "https://m.media-amazon.com/images/M/MV5BMmE1ODlhOTItNDlhMi00Y2ZhLWI4NTAtYTU3Y2M2MDlhNDhkXkEyXkFqcGc@._V1_SX300.jpg", desc: "A working man from the National Investigation Agency tries to protect his family." }
-            ],
-            movie: [
-                { title: "Pushpa 2: The Rule", year: "2024", rating: "8.8", poster: "https://m.media-amazon.com/images/M/MV5BN2E1Mjg3NDItNGNhMi00MDJjLWI3NTktYmZhZDJlMmI4Nzg4XkEyXkFqcGc@._V1_SX300.jpg", desc: "Pushpa Raj continues to rule the red sandalwood smuggling market." },
-                { title: "Kalki 2898 AD", year: "2024", rating: "7.6", poster: "https://m.media-amazon.com/images/M/MV5BNmU4M2E3YmEtMDVjNS00NTNlLTlhMjAtMDI1NWZjMDIzNDY3XkEyXkFqcGc@._V1_SX300.jpg", desc: "A modern avatar of Vishnu descended to protect the world." },
-                { title: "Deadpool & Wolverine", year: "2024", rating: "7.8", poster: "https://m.media-amazon.com/images/M/MV5BNzRiMjg0MzUtNTZmMi00M2M5LWEyYjMtMzA5MzUxM2YyNWJiXkEyXkFqcGc@._V1_SX300.jpg", desc: "Deadpool is offered a place in the Marvel Cinematic Universe." }
-            ]
-        };
+        const API_KEY = "841059f21a142833e034e30205f3b772";
+        const BASE_URL = "https://api.themoviedb.org/3";
+        const IMAGE_BASE = "https://image.tmdb.org/t3/p/w500";
+
+        let currentCategory = 'te';
+        let currentPage = 1;
+        let isSearchMode = false;
 
         window.onload = () => {
-            renderMovies(movieDatabase['te']);
+            fetchMovies(currentCategory, currentPage);
         };
 
         function changeCategory(catKey, btn) {
             document.querySelectorAll('.nav-buttons button').forEach(b => b.classList.remove('active'));
             if(btn) btn.classList.add('active');
             
-            const movies = movieDatabase[catKey] || movieDatabase['te'];
-            renderMovies(movies);
+            currentCategory = catKey;
+            currentPage = 1;
+            isSearchMode = false;
+            document.getElementById('moviesContainer').innerHTML = '';
+            document.getElementById('loadMoreBtn').style.display = 'inline-block';
+            
+            fetchMovies(catKey, currentPage);
+        }
+
+        async function fetchMovies(category, page) {
+            let url = "";
+
+            if (category === 'te') {
+                url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=te&sort_by=popularity.desc&page=${page}`;
+            } else if (category === 'hi') {
+                url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=hi&sort_by=popularity.desc&page=${page}`;
+            } else if (category === 'en') {
+                url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=en&sort_by=popularity.desc&page=${page}`;
+            } else if (category === 'kn') {
+                url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=kn&sort_by=popularity.desc&page=${page}`;
+            } else if (category === 'marvel') {
+                url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_companies=420&sort_by=popularity.desc&page=${page}`;
+            } else if (category === 'dc') {
+                url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_companies=128064|9993|429&sort_by=popularity.desc&page=${page}`;
+            } else if (category === 'movie') {
+                url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&sort_by=popularity.desc&page=${page}`;
+            } else if (category === 'tv') {
+                url = `${BASE_URL}/discover/tv?api_key=${API_KEY}&sort_by=popularity.desc&page=${page}`;
+            }
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Fetch Error");
+                const data = await response.json();
+                renderMovies(data.results);
+            } catch (error) {
+                fetchMoviesWithProxy(url);
+            }
+        }
+
+        async function fetchMoviesWithProxy(originalUrl) {
+            try {
+                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(originalUrl)}`;
+                const response = await fetch(proxyUrl);
+                const data = await response.json();
+                renderMovies(data.results);
+            } catch (err) {
+                console.error("Failed to load movies:", err);
+            }
         }
 
         function renderMovies(movies) {
             const container = document.getElementById('moviesContainer');
-            container.innerHTML = '';
 
-            if(!movies || movies.length === 0) {
-                container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">No movies found.</p>';
+            if (!movies || movies.length === 0) {
+                if (currentPage === 1) container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">No movies found.</p>';
+                document.getElementById('loadMoreBtn').style.display = 'none';
                 return;
             }
 
             movies.forEach(item => {
+                const title = item.title || item.name || 'Untitled';
+                const release = item.release_date || item.first_air_date || 'N/A';
+                const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
+                
+                // Handling Fallback Posters
+                const poster = item.poster_path 
+                    ? (IMAGE_BASE + item.poster_path) 
+                    : `https://via.placeholder.com/500x750/1e293b/ffffff?text=${encodeURIComponent(title)}`;
+                
+                const backdrop = item.backdrop_path ? (IMAGE_BASE + item.backdrop_path) : poster;
+
                 const card = document.createElement('div');
                 card.className = 'movie-card';
-                card.onclick = () => openModal(item.title, item.rating, item.year, item.desc, item.poster);
+                card.onclick = () => openModal(title, rating, release, item.overview, backdrop);
                 card.innerHTML = `
-                    <img src="${item.poster}" alt="${item.title}" loading="lazy">
+                    <img src="${poster}" alt="${title}" loading="lazy" onerror="this.src='https://via.placeholder.com/500x750/1e293b/ffffff?text=${encodeURIComponent(title)}'">
                     <div class="movie-info">
-                        <h3>${item.title}</h3>
-                        <p>⭐ ${item.rating} | 📅 ${item.year}</p>
+                        <h3>${title}</h3>
+                        <p>⭐ ${rating} | 📅 ${release.split('-')[0] || 'N/A'}</p>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
+        function loadMoreMovies() {
+            currentPage++;
+            if (isSearchMode) {
+                searchMoviesAPI(document.getElementById('searchInput').value, currentPage);
+            } else {
+                fetchMovies(currentCategory, currentPage);
+            }
+        }
+
         function performSearch() {
-            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            const query = document.getElementById('searchInput').value.trim();
             if (!query) return;
 
-            let allMovies = [];
-            Object.values(movieDatabase).forEach(list => allMovies.push(...list));
+            isSearchMode = true;
+            currentPage = 1;
+            document.getElementById('moviesContainer').innerHTML = '';
+            document.getElementById('loadMoreBtn').style.display = 'inline-block';
+            
+            searchMoviesAPI(query, currentPage);
+        }
 
-            const filtered = allMovies.filter(m => m.title.toLowerCase().includes(query));
-            renderMovies(filtered);
+        async function searchMoviesAPI(query, page) {
+            const url = `${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                renderMovies(data.results);
+            } catch (error) {
+                fetchMoviesWithProxy(url);
+            }
         }
 
         function openModal(title, rating, release, overview, imgUrl) {
             document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalMeta').innerText = `⭐ Rating: ${rating} / 10 | 📅 Release: ${release}`;
-            document.getElementById('modalDesc').innerText = overview;
+            document.getElementById('modalDesc').innerText = overview || 'No description available for this title.';
             document.getElementById('modalImg').src = imgUrl;
 
             document.getElementById('btnTrailer').href = `https://www.youtube.com/results?search_query=${encodeURIComponent(title + ' official trailer')}`;
