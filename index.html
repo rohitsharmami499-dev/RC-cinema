@@ -162,10 +162,11 @@
                 const release = item.release_date || item.first_air_date || 'N/A';
                 const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
                 
-                let rawPoster = item.poster_path ? `https://image.tmdb.org/t3/p/w500${item.poster_path}` : null;
-                let poster = rawPoster 
-                    ? `https://images.weserv.nl/?url=${encodeURIComponent(rawPoster)}`
-                    : `https://via.placeholder.com/500x750/1e293b/ffffff?text=${encodeURIComponent(title)}`;
+                let rawPoster = item.poster_path ? `https://image.tmdb.org/t3/p/original${item.poster_path}` : null;
+let poster = rawPoster 
+    ? `https://images.weserv.nl/?url=${encodeURIComponent(rawPoster)}` 
+    : `https://via.placeholder.com/500x750/1e293b/ffffff?text=${encodeURIComponent(title)}`;
+
 
                 let rawBackdrop = item.backdrop_path ? `https://image.tmdb.org/t3/p/w500${item.backdrop_path}` : rawPoster;
                 let backdrop = rawBackdrop 
