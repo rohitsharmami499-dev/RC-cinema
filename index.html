@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlashInfo - Movies, Sports & Games</title>
+    <title>FlashInfo - Movies & Web Series</title>
     <style>
         * {
             margin: 0;
@@ -22,6 +22,9 @@
             padding: 15px;
             text-align: center;
             border-bottom: 2px solid #eab308;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .logo {
@@ -41,26 +44,56 @@
             gap: 6px;
             max-width: 450px;
             margin: 0 auto 15px auto;
+            position: relative;
         }
 
         .search-container input {
-            width: 70%;
-            padding: 8px 12px;
-            border-radius: 4px;
+            width: 75%;
+            padding: 10px 14px;
+            border-radius: 6px;
             border: 1px solid #334155;
             background: #ffffff;
             color: #000000;
             outline: none;
+            font-size: 14px;
         }
 
         .search-container button {
-            padding: 8px 14px;
-            border-radius: 4px;
+            padding: 10px 16px;
+            border-radius: 6px;
             border: none;
-            background: #e2e8f0;
+            background: #eab308;
             color: #0f172a;
             font-weight: bold;
             cursor: pointer;
+        }
+
+        .suggestions-box {
+            position: absolute;
+            top: 45px;
+            left: 5%;
+            width: 75%;
+            background: #1e293b;
+            border-radius: 6px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            text-align: left;
+        }
+
+        .suggestion-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #334155;
+            font-size: 14px;
+        }
+
+        .suggestion-item:hover {
+            background: #334155;
         }
 
         .nav-buttons {
@@ -68,7 +101,7 @@
             flex-wrap: wrap;
             justify-content: center;
             gap: 8px;
-            max-width: 500px;
+            max-width: 650px;
             margin: 0 auto;
         }
 
@@ -79,35 +112,35 @@
             padding: 8px 16px;
             border-radius: 18px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
         }
 
         .nav-buttons button.active {
             background: #eab308;
             color: #000000;
-            font-weight: bold;
         }
 
         .sports-banner {
             background: #111a33;
             border: 1px solid #1e293b;
             border-radius: 12px;
-            padding: 20px 15px;
-            margin: 20px 15px;
+            padding: 15px;
+            margin: 15px;
             text-align: center;
         }
 
         .sports-banner h3 {
             color: #38bdf8;
-            font-size: 16px;
-            margin-bottom: 8px;
+            font-size: 15px;
+            margin-bottom: 6px;
         }
 
         .sports-banner p {
             color: #94a3b8;
-            font-size: 13px;
-            margin-bottom: 15px;
-            line-height: 1.4;
+            font-size: 12px;
+            margin-bottom: 12px;
         }
 
         .sports-banner .btn-live {
@@ -115,10 +148,10 @@
             color: #000000;
             text-decoration: none;
             font-weight: bold;
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 8px 16px;
+            border-radius: 6px;
             display: inline-block;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .movies-grid {
@@ -132,13 +165,17 @@
             background: #131c38;
             border-radius: 8px;
             overflow: hidden;
-            text-align: center;
-            padding-bottom: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-4px);
         }
 
         .movie-card img {
             width: 100%;
-            height: 180px;
+            height: 190px;
             object-fit: cover;
         }
 
@@ -159,47 +196,93 @@
             margin-top: 4px;
         }
 
-        .games-section {
-            padding: 20px;
-            text-align: center;
-        }
-
-        .games-menu {
-            display: flex;
+        /* Movie Details Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .games-menu button {
-            background: #00d2ff;
-            color: #000;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .game-board {
-            display: grid;
-            grid-template-columns: repeat(3, 70px);
-            gap: 5px;
-            margin: 15px auto;
-            width: 220px;
-        }
-
-        .cell {
-            width: 70px;
-            height: 70px;
-            background: #1e293b;
-            font-size: 1.8rem;
-            display: flex;
             align-items: center;
-            justify-content: center;
+            padding: 15px;
+        }
+
+        .modal-content {
+            background: #131c38;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            padding: 20px;
+            border: 1px solid #eab308;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            color: #ffffff;
             cursor: pointer;
+        }
+
+        .modal-img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
             border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            color: #eab308;
+            margin-bottom: 8px;
+        }
+
+        .modal-meta {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 12px;
+        }
+
+        .modal-desc {
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            color: #cbd5e1;
+        }
+
+        .modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-action {
+            display: block;
+            text-align: center;
+            padding: 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .btn-trailer {
+            background: #ff0000;
+            color: #ffffff;
+        }
+
+        .btn-watch {
+            background: #00d2ff;
+            color: #000000;
         }
     </style>
 </head>
@@ -208,204 +291,208 @@
     <header>
         <div class="logo">⚡ FlashInfo</div>
         <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search Movies or Web Series...">
+            <input type="text" id="searchInput" placeholder="Search Movies or Web Series..." oninput="handleSearchInput(this.value)">
             <button onclick="performSearch()">Search</button>
+            <div id="suggestionsBox" class="suggestions-box"></div>
         </div>
         <div class="nav-buttons">
-            <button onclick="filterCategory('movie')">🎬 Movies</button>
-            <button onclick="filterCategory('tv')">📺 Web Series</button>
-            <button class="active" onclick="filterLanguage('te', this)">Telugu</button>
+            <button class="active" onclick="filterCategory('movie', this)">🎬 Movies</button>
+            <button onclick="filterCategory('tv', this)">📺 Web Series</button>
+            <button onclick="filterLanguage('te', this)">Telugu</button>
             <button onclick="filterLanguage('hi', this)">Hindi</button>
             <button onclick="filterLanguage('en', this)">English</button>
             <button onclick="filterLanguage('kn', this)">Kannada</button>
-            <button onclick="showGamesSection()">🎮 Free Games</button>
+            <button onclick="filterSpecial('marvel', this)">🦸 Marvel</button>
+            <button onclick="filterSpecial('dc', this)">🦇 DC Studio</button>
         </div>
     </header>
 
-    <div class="sports-banner" id="sportsBanner">
+    <div class="sports-banner">
         <h3>🏏 FlashInfo Sports: Live Cricket Updates</h3>
-        <p>Get instant live scores, upcoming match schedules & latest news directly on Cricbuzz.</p>
-        <a href="https://m.cricbuzz.com/cricket-match/live-scores" target="_blank" class="btn-live">View Live Scores & Updates 🚀</a>
+        <p>Get instant live scores, match schedules & news directly on Cricbuzz.</p>
+        <a href="https://m.cricbuzz.com/cricket-match/live-scores" target="_blank" class="btn-live">View Live Scores 🚀</a>
     </div>
 
     <div id="moviesContainer" class="movies-grid"></div>
-    <div id="gamesContainer" class="games-section" style="display:none;"></div>
+
+    <!-- Movie Details Popup -->
+    <div id="movieModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <img id="modalImg" class="modal-img" src="" alt="">
+            <h2 id="modalTitle" class="modal-title"></h2>
+            <div id="modalMeta" class="modal-meta"></div>
+            <p id="modalDesc" class="modal-desc"></p>
+            <div class="modal-actions">
+                <a id="btnTrailer" class="btn-action btn-trailer" target="_blank">▶ Watch Trailer on YouTube</a>
+                <a id="btnWatch" class="btn-action btn-watch" target="_blank">🔍 Search Streaming Platforms</a>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // Sample Movies & Web Series Data (Fallback System)
-        const mediaData = {
-            te: [
-                { title: "Kalki 2898 AD", rating: "8.5", date: "2024", img: "https://image.tmdb.org/t3/p/w500/1X64hN6gVlI0D9E0eT9lFp7uL0J.jpg" },
-                { title: "Devara", rating: "8.1", date: "2024", img: "https://image.tmdb.org/t3/p/w500/A68nZ5mI6i5FzY2M8u2L8R3p0P.jpg" },
-                { title: "Pushpa 2", rating: "8.9", date: "2024", img: "https://image.tmdb.org/t3/p/w500/A2nZ5mI6i5FzY2M8u2L8R3p0P.jpg" },
-                { title: "Salaar", rating: "8.3", date: "2023", img: "https://image.tmdb.org/t3/p/w500/2L8R3p0P1X64hN6gVlI0D9E0eT.jpg" }
-            ],
-            hi: [
-                { title: "Jawan", rating: "8.2", date: "2023", img: "https://image.tmdb.org/t3/p/w500/iA4iI9vL2Y3QzI2l7A8fE4r0M.jpg" },
-                { title: "Stree 2", rating: "8.4", date: "2024", img: "https://image.tmdb.org/t3/p/w500/8R3p0P1X64hN6gVlI0D9E0eT9.jpg" },
-                { title: "Pathaan", rating: "7.9", date: "2023", img: "https://image.tmdb.org/t3/p/w500/a2zX9M3N8P2L0K1J2H3G4F5E6.jpg" }
-            ],
-            en: [
-                { title: "Avatar 2", rating: "8.8", date: "2022", img: "https://image.tmdb.org/t3/p/w500/t6HIqrRAOXZM23321A8fE4r0M.jpg" },
-                { title: "Oppenheimer", rating: "8.9", date: "2023", img: "https://image.tmdb.org/t3/p/w500/8Gxv8K8A2a2C1B2d3E4f5G6h7.jpg" }
-            ],
-            kn: [
-                { title: "KGF Chapter 2", rating: "9.0", date: "2022", img: "https://image.tmdb.org/t3/p/w500/q2Z9M3N8P2L0K1J2H3G4F5E6a.jpg" },
-                { title: "Kantara", rating: "8.8", date: "2022", img: "https://image.tmdb.org/t3/p/w500/3Z9M3N8P2L0K1J2H3G4F5E6a1.jpg" }
-            ]
-        };
+        const API_KEY = '59973be85848763e326b1c3ef9461129';
+        const BASE_URL = 'https://api.themoviedb.org/3';
+        const IMG_URL = 'https://image.tmdb.org/t3/p/w500';
 
+        let currentType = 'movie';
+        let currentMode = 'category';
         let currentLang = 'te';
 
         window.onload = () => {
-            renderMovies();
+            fetchMovies();
         };
 
-        function renderMovies(list = null) {
-            document.getElementById("gamesContainer").style.display = "none";
-            document.getElementById("sportsBanner").style.display = "block";
+        function updateActiveButton(btn) {
+            if (btn) {
+                document.querySelectorAll('.nav-buttons button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+        }
+
+        async function fetchMovies(customUrl = null) {
             const container = document.getElementById("moviesContainer");
-            container.style.display = "grid";
+            container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">Loading content...</p>';
+
+            let url = customUrl;
+            if (!url) {
+                if (currentMode === 'category') {
+                    url = `${BASE_URL}/${currentType}/popular?api_key=${API_KEY}&page=1`;
+                } else if (currentMode === 'language') {
+                    url = `${BASE_URL}/discover/${currentType}?api_key=${API_KEY}&with_original_language=${currentLang}&sort_by=popularity.desc`;
+                }
+            }
+
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                
+                if (!data.results || data.results.length === 0) {
+                    const fallbackRes = await fetch(`${BASE_URL}/${currentType}/popular?api_key=${API_KEY}`);
+                    const fallbackData = await fallbackRes.json();
+                    displayItems(fallbackData.results);
+                } else {
+                    displayItems(data.results);
+                }
+            } catch (err) {
+                container.innerHTML = '<p style="color:red; text-align:center; grid-column:1/-1;">Error loading movies. Please try again.</p>';
+            }
+        }
+
+        function filterCategory(type, btn) {
+            updateActiveButton(btn);
+            currentType = type;
+            currentMode = 'category';
+            fetchMovies();
+        }
+
+        function filterLanguage(lang, btn) {
+            updateActiveButton(btn);
+            currentLang = lang;
+            currentMode = 'language';
+            fetchMovies();
+        }
+
+        function filterSpecial(company, btn) {
+            updateActiveButton(btn);
+            let companyId = company === 'marvel' ? '420' : '128064'; // Marvel / DC Company IDs in TMDB
+            let url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_companies=${companyId}&sort_by=popularity.desc`;
+            fetchMovies(url);
+        }
+
+        function displayItems(items) {
+            const container = document.getElementById('moviesContainer');
             container.innerHTML = '';
 
-            const items = list || mediaData[currentLang] || mediaData['te'];
+            if (!items || items.length === 0) {
+                container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">No content found.</p>';
+                return;
+            }
 
             items.forEach(item => {
+                const title = item.title || item.name;
+                const release = item.release_date || item.first_air_date || 'N/A';
                 const card = document.createElement('div');
                 card.className = 'movie-card';
+                card.onclick = () => openModal(item);
                 card.innerHTML = `
-                    <img src="${item.img}" onerror="this.src='https://via.placeholder.com/150x220?text=Movie'" alt="${item.title}">
+                    <img src="${item.poster_path ? IMG_URL + item.poster_path : 'https://via.placeholder.com/500x750?text=No+Poster'}" alt="${title}">
                     <div class="movie-info">
-                        <h3>${item.title}</h3>
-                        <p>⭐ ${item.rating} | 📅 ${item.date}</p>
+                        <h3>${title}</h3>
+                        <p>⭐ ${item.vote_average ? item.vote_average.toFixed(1) : 'N/A'} | 📅 ${release}</p>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        function filterCategory(type) {
-            renderMovies();
-        }
-
-        function filterLanguage(lang, btn) {
-            if (btn) {
-                document.querySelectorAll('.nav-buttons button').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
+        // Live Search with Suggestions
+        async function handleSearchInput(query) {
+            const box = document.getElementById('suggestionsBox');
+            if (!query || query.trim().length < 2) {
+                box.innerHTML = '';
+                return;
             }
-            currentLang = lang;
-            renderMovies();
+
+            try {
+                const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+                const data = await res.json();
+                const filtered = (data.results || []).slice(0, 6);
+                
+                box.innerHTML = '';
+                filtered.forEach(item => {
+                    const title = item.title || item.name;
+                    if (!title) return;
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item';
+                    div.innerHTML = `<span>${title} (${item.media_type === 'tv' ? 'Series' : 'Movie'})</span>`;
+                    div.onclick = () => {
+                        box.innerHTML = '';
+                        openModal(item);
+                    };
+                    box.appendChild(div);
+                });
+            } catch(e) {
+                box.innerHTML = '';
+            }
         }
 
         function performSearch() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            if (!query) return;
-            const currentList = mediaData[currentLang] || mediaData['te'];
-            const filtered = currentList.filter(m => m.title.toLowerCase().includes(query));
-            renderMovies(filtered.length ? filtered : currentList);
+            const query = document.getElementById('searchInput').value;
+            if (query) {
+                document.getElementById('suggestionsBox').innerHTML = '';
+                fetchMovies(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+            }
         }
 
-        // --- GAMES HUB ---
-        function showGamesSection() {
-            document.getElementById("moviesContainer").style.display = "none";
-            document.getElementById("sportsBanner").style.display = "none";
-            const gamesCont = document.getElementById("gamesContainer");
-            gamesCont.style.display = "block";
-            
-            gamesCont.innerHTML = `
-                <h2>🎮 Free Games Hub</h2>
-                <p style="color:#94a3b8; margin-bottom:15px;">Game ఎంచుకుని ఆడండి!</p>
-                <div class="games-menu">
-                    <button onclick="loadTicTacToe()">❌ Tic Tac Toe</button>
-                    <button onclick="loadRPS()">✂️ Rock Paper Scissors</button>
-                    <button onclick="loadGuessNum()">🔢 Number Guessing</button>
-                </div>
-                <div id="activeGameArea"></div>
-            `;
-            loadTicTacToe();
+        // Details Modal Pop-up Logic
+        function openModal(item) {
+            const title = item.title || item.name;
+            const release = item.release_date || item.first_air_date || 'N/A';
+            const overview = item.overview || 'No story synopsis available.';
+            const backdrop = item.backdrop_path || item.poster_path;
+
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMeta').innerText = `⭐ Rating: ${item.vote_average ? item.vote_average.toFixed(1) : 'N/A'} / 10 | 📅 Release: ${release}`;
+            document.getElementById('modalDesc').innerText = overview;
+            document.getElementById('modalImg').src = backdrop ? IMG_URL + backdrop : 'https://via.placeholder.com/500x280?text=No+Image';
+
+            // Links
+            document.getElementById('btnTrailer').href = `https://www.youtube.com/results?search_query=${encodeURIComponent(title + ' official trailer')}`;
+            document.getElementById('btnWatch').href = `https://www.google.com/search?q=${encodeURIComponent('where to watch ' + title + ' streaming online')}`;
+
+            document.getElementById('movieModal').style.display = 'flex';
         }
 
-        // Tic Tac Toe Game
-        let board = ["", "", "", "", "", "", "", "", ""];
-        let currentPlayer = "❌";
-
-        function loadTicTacToe() {
-            board = ["", "", "", "", "", "", "", "", ""];
-            currentPlayer = "❌";
-            updateBoard();
+        function closeModal() {
+            document.getElementById('movieModal').style.display = 'none';
         }
 
-        function updateBoard() {
-            const area = document.getElementById("activeGameArea");
-            area.innerHTML = `
-                <h3>Tic Tac Toe</h3>
-                <p style="margin-top:5px;">Turn: ${currentPlayer}</p>
-                <div class="game-board">
-                    ${board.map((val, idx) => `<div class="cell" onclick="makeMove(${idx})">${val}</div>`).join('')}
-                </div>
-                <button onclick="loadTicTacToe()" style="padding:6px 12px; background:#eab308; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">Restart Game</button>
-            `;
-        }
-
-        function makeMove(index) {
-            if (board[index] !== "") return;
-            board[index] = currentPlayer;
-            currentPlayer = currentPlayer === "❌" ? "⭕" : "❌";
-            updateBoard();
-        }
-
-        // Rock Paper Scissors Game
-        function loadRPS() {
-            const area = document.getElementById("activeGameArea");
-            area.innerHTML = `
-                <h3>Rock Paper Scissors</h3>
-                <p style="margin:10px 0;">మీ ఆప్షన్ ఎంచుకోండి:</p>
-                <div style="display:flex; justify-content:center; gap:10px;">
-                    <button onclick="playRPS('✊')" style="font-size:24px; padding:10px; cursor:pointer;">✊</button>
-                    <button onclick="playRPS('✋')" style="font-size:24px; padding:10px; cursor:pointer;">✋</button>
-                    <button onclick="playRPS('✌️')" style="font-size:24px; padding:10px; cursor:pointer;">✌️</button>
-                </div>
-                <div id="rpsResult" style="margin-top:15px; font-size:16px;"></div>
-            `;
-        }
-
-        function playRPS(userChoice) {
-            const choices = ['✊', '✋', '✌️'];
-            const compChoice = choices[Math.floor(Math.random() * 3)];
-            let res = '';
-            if(userChoice === compChoice) res = "It's a Tie! 🤝";
-            else if(
-                (userChoice === '✊' && compChoice === '✌️') ||
-                (userChoice === '✋' && compChoice === '✊') ||
-                (userChoice === '✌️' && compChoice === '✋')
-            ) res = "You Won! 🎉";
-            else res = "Computer Won! 🤖";
-
-            document.getElementById("rpsResult").innerHTML = `You: ${userChoice} vs Comp: ${compChoice}<br><b>${res}</b>`;
-        }
-
-        // Number Guessing Game
-        let targetNum = Math.floor(Math.random() * 20) + 1;
-        function loadGuessNum() {
-            targetNum = Math.floor(Math.random() * 20) + 1;
-            const area = document.getElementById("activeGameArea");
-            area.innerHTML = `
-                <h3>Guess Number (1 to 20)</h3>
-                <div style="margin:15px 0;">
-                    <input type="number" id="numInput" placeholder="Enter 1-20" style="padding:6px; width:100px; text-align:center;">
-                    <button onclick="checkGuess()" style="padding:6px 12px; background:#eab308; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">Guess</button>
-                </div>
-                <div id="guessResult"></div>
-            `;
-        }
-
-        function checkGuess() {
-            const val = parseInt(document.getElementById("numInput").value);
-            const res = document.getElementById("guessResult");
-            if(!val) return;
-            if(val === targetNum) res.innerHTML = "🎉 Correct! You Guessed it!";
-            else if(val < targetNum) res.innerHTML = "📉 Too Low! Try again.";
-            else res.innerHTML = "📈 Too High! Try again.";
+        window.onclick = function(event) {
+            const modal = document.getElementById('movieModal');
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
         }
     </script>
 </body>
