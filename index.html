@@ -34,6 +34,10 @@
         .movie-info h3 { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ffffff; margin-bottom: 4px; }
         .movie-info p { font-size: 11px; color: #94a3b8; }
 
+        .load-more-box { text-align: center; margin: 25px 0 45px 0; }
+        .btn-load-more { background: #eab308; color: #0f172a; border: none; padding: 12px 30px; border-radius: 25px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(234, 179, 8, 0.3); }
+        .btn-load-more:hover { background: #facc15; transform: scale(1.05); }
+
         /* Modal Popup */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.88); z-index: 2000; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(4px); }
         .modal-content { background: #131c38; border-radius: 12px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; padding: 20px; border: 1px solid #eab308; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
@@ -53,7 +57,7 @@
     <header>
         <div class="logo">⚡ FlashInfo</div>
         <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search any movie or web series..." onkeyup="performSearch()">
+            <input type="text" id="searchInput" placeholder="Search any movie or web series..." onkeyup="if(event.key === 'Enter') performSearch()">
             <button onclick="performSearch()">Search</button>
         </div>
         <div class="nav-buttons">
@@ -76,6 +80,10 @@
 
     <div id="moviesContainer" class="movies-grid"></div>
 
+    <div class="load-more-box">
+        <button id="loadMoreBtn" class="btn-load-more" onclick="loadMoreMovies()">Load More Movies 🔄</button>
+    </div>
+
     <!-- Movie Details Popup -->
     <div id="movieModal" class="modal">
         <div class="modal-content">
@@ -92,87 +100,128 @@
     </div>
 
     <script>
-        const moviesData = {
-            te: [
-                { title: "Pushpa 2: The Rule", year: "2024", rating: "8.8", poster: "https://m.media-amazon.com/images/M/MV5BN2E1Mjg3NDItNGNhMi00MDJjLWI3NTktYmZhZDJlMmI4Nzg4XkEyXkFqcGc@._V1_SX300.jpg", desc: "Pushpa Raj continues to rule the red sandalwood smuggling market." },
-                { title: "Kalki 2898 AD", year: "2024", rating: "7.6", poster: "https://m.media-amazon.com/images/M/MV5BNmU4M2E3YmEtMDVjNS00NTNlLTlhMjAtMDI1NWZjMDIzNDY3XkEyXkFqcGc@._V1_SX300.jpg", desc: "A modern avatar of Vishnu descended to earth to protect the world." },
-                { title: "Devara: Part 1", year: "2024", rating: "7.1", poster: "https://m.media-amazon.com/images/M/MV5BYzA4ZDQ4NmItYzA3OS00YWI0LWI1YWMtZWY2NWJkYmJhOTk2XkEyXkFqcGc@._V1_SX300.jpg", desc: "An epic action saga set against the coastal lands of India." },
-                { title: "RRR", year: "2022", rating: "7.8", poster: "https://m.media-amazon.com/images/M/MV5BODUwNDNjYzctODUxNy00ZTA2LWIyMDctM2JhMTU5M2E2OWUxXkEyXkFqcGc@._V1_SX300.jpg", desc: "A tale of two legendary revolutionaries and their journey." },
-                { title: "Salaar: Ceasefire", year: "2023", rating: "6.5", poster: "https://m.media-amazon.com/images/M/MV5BMmU2NGNiM2YtM2JmNC00YjhmLTg1Y2ItYTVmNTM0N2NlY2I0XkEyXkFqcGc@._V1_SX300.jpg", desc: "A gang leader tries to keep a promise made to his dying friend." },
-                { title: "Guntur Kaaram", year: "2024", rating: "6.2", poster: "https://m.media-amazon.com/images/M/MV5BZDQwZmE2MzYtN2E0NC00M2E1LTg3MDUtMDNlM2NmMWJhMzI3XkEyXkFqcGc@._V1_SX300.jpg", desc: "Action drama revolving around the king of the underworld in Guntur." }
-            ],
-            hi: [
-                { title: "Stree 2", year: "2024", rating: "7.4", poster: "https://m.media-amazon.com/images/M/MV5BZDU1NzI2YTMtMDk4OC00N2EzLThmYjAtN2NmMDY0MmQ3NTNhXkEyXkFqcGc@._V1_SX300.jpg", desc: "The town of Chanderi is haunted again by a headless entity." },
-                { title: "Jawan", year: "2023", rating: "7.0", poster: "https://m.media-amazon.com/images/M/MV5BMjA1NmY2YWEtMDRhNi00NTgwLWIzZmItZWI1ZjYzNGZhYThlXkEyXkFqcGc@._V1_SX300.jpg", desc: "A personal vendetta drives a man to rectify the wrongs in society." },
-                { title: "Animal", year: "2023", rating: "6.6", poster: "https://m.media-amazon.com/images/M/MV5BNGViM2M4NmUtMmE3ZC00HVyLTg5MjUtNWU2N2E3NWJhN2I1XkEyXkFqcGc@._V1_SX300.jpg", desc: "A fierce father-son bond takes a dark and violent turn." }
-            ],
-            en: [
-                { title: "Oppenheimer", year: "2023", rating: "8.9", poster: "https://m.media-amazon.com/images/M/MV5BN2JkMDc5MGQtMmJiNi00OWVjLWE0ZjgtZDliMTZmMGI1GJhXkEyXkFqcGc@._V1_SX300.jpg", desc: "The story of J. Robert Oppenheimer and the atomic bomb." },
-                { title: "Avengers: Endgame", year: "2019", rating: "8.4", poster: "https://m.media-amazon.com/images/M/MV5BMTc5MDE2ODcwNV5BMl5BanBnXkFtZTgwMzI2NzIzNzM@._V1_SX300.jpg", desc: "The Avengers assemble once more to reverse Thanos' actions." }
-            ],
-            kn: [
-                { title: "K.G.F: Chapter 2", year: "2022", rating: "8.3", poster: "https://m.media-amazon.com/images/M/MV5BM2M0YmIxNzItOWI4OS00MmE3LTk3ODctYzA3OWIzNWZhNWZhXkEyXkFqcGc@._V1_SX300.jpg", desc: "In Kolar Gold Fields, Rocky's name strikes fear into his foes." },
-                { title: "Kantara", year: "2022", rating: "8.2", poster: "https://m.media-amazon.com/images/M/MV5BNjQyNGI5OWEtZjI1Yy00NDVjLWE4MTAtM2FiTF00I2I3YzA4XkEyXkFqcGc@._V1_SX300.jpg", desc: "A conflict between village tradition and forestry officials." }
-            ],
-            marvel: [
-                { title: "Deadpool & Wolverine", year: "2024", rating: "7.8", poster: "https://m.media-amazon.com/images/M/MV5BNzRiMjg0MzUtNTZmMi00M2M5LWEyYjMtMzA5MzUxM2YyNWJiXkEyXkFqcGc@._V1_SX300.jpg", desc: "Deadpool is offered a place in the Marvel Cinematic Universe." }
-            ],
-            dc: [
-                { title: "The Batman", year: "2022", rating: "7.8", poster: "https://m.media-amazon.com/images/M/MV5BMDdmMTBiNTYtMDIzNi00NGVlLWIzMDYtZTk3MTQ3NGQxU2FlXkEyXkFqcGc@._V1_SX300.jpg", desc: "When a sadistic serial killer begins murdering key political figures." }
-            ],
-            movie: [
-                { title: "Pushpa 2: The Rule", year: "2024", rating: "8.8", poster: "https://m.media-amazon.com/images/M/MV5BN2E1Mjg3NDItNGNhMi00MDJjLWI3NTktYmZhZDJlMmI4Nzg4XkEyXkFqcGc@._V1_SX300.jpg", desc: "Pushpa Raj continues to rule the red sandalwood smuggling market." },
-                { title: "Kalki 2898 AD", year: "2024", rating: "7.6", poster: "https://m.media-amazon.com/images/M/MV5BNmU4M2E3YmEtMDVjNS00NTNlLTlhMjAtMDI1NWZjMDIzNDY3XkEyXkFqcGc@._V1_SX300.jpg", desc: "A modern avatar of Vishnu descended to earth to protect the world." }
-            ],
-            tv: [
-                { title: "Stranger Things", year: "2016-", rating: "8.7", poster: "https://m.media-amazon.com/images/M/MV5BM2M1MmVhNDgtNmI0MS00ZDNmLThlOWUtNDJiN2ZkNzA3NzUxXkEyXkFqcGc@._V1_SX300.jpg", desc: "When a young boy vanishes, a small town uncovers a mystery." }
-            ]
-        };
+        const API_KEY = "841059f21a142833e034e30205f3b772";
+        const BASE_URL = "https://api.themoviedb.org/3";
+        const IMAGE_BASE = "https://image.tmdb.org/t3/p/w500";
+
+        let currentCategory = 'te';
+        let currentPage = 1;
+        let isSearchMode = false;
 
         window.onload = () => {
-            renderMovies(moviesData['te']);
+            fetchMovies(currentCategory, currentPage);
         };
 
-        function changeCategory(key, btn) {
+        function changeCategory(catKey, btn) {
             document.querySelectorAll('.nav-buttons button').forEach(b => b.classList.remove('active'));
             if(btn) btn.classList.add('active');
-            renderMovies(moviesData[key] || moviesData['te']);
+            
+            currentCategory = catKey;
+            currentPage = 1;
+            isSearchMode = false;
+            document.getElementById('moviesContainer').innerHTML = '';
+            document.getElementById('loadMoreBtn').style.display = 'inline-block';
+            
+            fetchMovies(catKey, currentPage);
         }
 
-        function renderMovies(list) {
-            const container = document.getElementById('moviesContainer');
-            container.innerHTML = '';
+        function getApiUrl(category, page) {
+            if (category === 'te') return `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=te&sort_by=popularity.desc&page=${page}`;
+            if (category === 'hi') return `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=hi&sort_by=popularity.desc&page=${page}`;
+            if (category === 'en') return `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=en&sort_by=popularity.desc&page=${page}`;
+            if (category === 'kn') return `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=kn&sort_by=popularity.desc&page=${page}`;
+            if (category === 'marvel') return `${BASE_URL}/search/movie?api_key=${API_KEY}&query=Marvel&page=${page}`;
+            if (category === 'dc') return `${BASE_URL}/search/movie?api_key=${API_KEY}&query=Batman&page=${page}`;
+            if (category === 'movie') return `${BASE_URL}/movie/popular?api_key=${API_KEY}&page=${page}`;
+            if (category === 'tv') return `${BASE_URL}/tv/popular?api_key=${API_KEY}&page=${page}`;
+            return `${BASE_URL}/movie/popular?api_key=${API_KEY}&page=${page}`;
+        }
 
-            if(!list || list.length === 0) {
-                container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">No movies found.</p>';
-                return;
+        async function fetchMovies(category, page) {
+            const url = getApiUrl(category, page);
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.results && data.results.length > 0) {
+                    renderMovies(data.results);
+                } else {
+                    if (currentPage === 1) {
+                        document.getElementById('moviesContainer').innerHTML = '<p style="text-align:center; grid-column:1/-1;">No movies found.</p>';
+                    }
+                    document.getElementById('loadMoreBtn').style.display = 'none';
+                }
+            } catch (error) {
+                console.error("API Error:", error);
             }
+        }
 
-            list.forEach(item => {
+        function renderMovies(movies) {
+            const container = document.getElementById('moviesContainer');
+
+            movies.forEach(item => {
+                const title = item.title || item.name || 'Untitled';
+                const release = item.release_date || item.first_air_date || 'N/A';
+                const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
+                
+                // TMDB Poster with fallback
+                const poster = item.poster_path 
+                    ? (IMAGE_BASE + item.poster_path) 
+                    : `https://via.placeholder.com/500x750/1e293b/ffffff?text=${encodeURIComponent(title)}`;
+                
+                const backdrop = item.backdrop_path ? (IMAGE_BASE + item.backdrop_path) : poster;
+                const overview = item.overview || 'No description available.';
+
                 const card = document.createElement('div');
                 card.className = 'movie-card';
-                card.onclick = () => openModal(item.title, item.rating, item.year, item.desc, item.poster);
+                card.onclick = () => openModal(title, rating, release, overview, backdrop);
                 card.innerHTML = `
-                    <img src="${item.poster}" alt="${item.title}">
+                    <img src="${poster}" alt="${title}" loading="lazy" onerror="this.src='https://via.placeholder.com/500x750/1e293b/ffffff?text=${encodeURIComponent(title)}'">
                     <div class="movie-info">
-                        <h3>${item.title}</h3>
-                        <p>⭐ ${item.rating} | 📅 ${item.year}</p>
+                        <h3>${title}</h3>
+                        <p>⭐ ${rating} | 📅 ${release.split('-')[0] || 'N/A'}</p>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        function performSearch() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            if(!query) {
-                renderMovies(moviesData['te']);
-                return;
+        function loadMoreMovies() {
+            currentPage++;
+            if (isSearchMode) {
+                searchMoviesAPI(document.getElementById('searchInput').value, currentPage);
+            } else {
+                fetchMovies(currentCategory, currentPage);
             }
-            let all = [];
-            Object.values(moviesData).forEach(arr => all.push(...arr));
-            const filtered = all.filter(m => m.title.toLowerCase().includes(query));
-            renderMovies(filtered);
+        }
+
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
+
+            isSearchMode = true;
+            currentPage = 1;
+            document.getElementById('moviesContainer').innerHTML = '';
+            document.getElementById('loadMoreBtn').style.display = 'inline-block';
+            
+            searchMoviesAPI(query, currentPage);
+        }
+
+        async function searchMoviesAPI(query, page) {
+            const url = `${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.results && data.results.length > 0) {
+                    renderMovies(data.results);
+                } else {
+                    if (currentPage === 1) {
+                        document.getElementById('moviesContainer').innerHTML = '<p style="text-align:center; grid-column:1/-1;">No movies found.</p>';
+                    }
+                    document.getElementById('loadMoreBtn').style.display = 'none';
+                }
+            } catch (error) {
+                console.error("Search Error:", error);
+            }
         }
 
         function openModal(title, rating, release, overview, imgUrl) {
