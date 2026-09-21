@@ -1,78 +1,88 @@
-   <!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RG Cinema - Movies & Games</title>
+    <title>FlashInfo - Movies, Sports & Games</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background-color: #0f172a;
+            background-color: #0b1329;
             color: #ffffff;
         }
 
         header {
-            background: #1e293b;
+            background: #131c38;
             padding: 15px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
+            text-align: center;
+            border-bottom: 2px solid #eab308;
         }
 
         .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #00d2ff;
+            font-size: 28px;
+            font-weight: 800;
+            color: #eab308;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
-        .search-box {
+        .search-container {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            max-width: 450px;
+            margin: 0 auto 15px auto;
             position: relative;
-            width: 100%;
-            max-width: 400px;
         }
 
-        .search-box input {
-            width: 100%;
-            padding: 10px 15px;
-            border-radius: 20px;
-            border: none;
+        .search-container input {
+            width: 70%;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #334155;
+            background: #ffffff;
+            color: #000000;
             outline: none;
-            background: #334155;
-            color: #fff;
+        }
+
+        .search-container button {
+            padding: 8px 14px;
+            border-radius: 4px;
+            border: none;
+            background: #e2e8f0;
+            color: #0f172a;
+            font-weight: bold;
+            cursor: pointer;
         }
 
         .suggestions-box {
             position: absolute;
-            top: 45px;
-            left: 0;
-            width: 100%;
+            top: 40px;
+            left: 5%;
+            width: 70%;
             background: #1e293b;
-            border-radius: 8px;
+            border-radius: 4px;
             max-height: 250px;
             overflow-y: auto;
-            z-index: 100;
+            z-index: 1000;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            text-align: left;
         }
 
         .suggestion-item {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 10px;
+            padding: 8px;
             cursor: pointer;
             border-bottom: 1px solid #334155;
         }
@@ -81,85 +91,99 @@
             background: #334155;
         }
 
-        nav {
+        .nav-buttons {
             display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 5px;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            max-width: 500px;
+            margin: 0 auto;
         }
 
-        nav button {
-            background: #334155;
-            color: #fff;
+        .nav-buttons button {
+            background: #253354;
+            color: #ffffff;
             border: none;
             padding: 8px 16px;
-            border-radius: 20px;
+            border-radius: 18px;
             cursor: pointer;
-            white-space: nowrap;
-            transition: 0.3s;
+            font-size: 14px;
         }
 
-        nav button.active, nav button:hover {
-            background: #00d2ff;
-            color: #000;
+        .nav-buttons button.active {
+            background: #eab308;
+            color: #000000;
             font-weight: bold;
         }
 
-        .cricket-banner {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            border: 1px solid #334155;
-            padding: 15px;
-            margin: 15px;
-            border-radius: 10px;
+        .sports-banner {
+            background: #111a33;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 20px 15px;
+            margin: 20px 15px;
             text-align: center;
         }
 
-        .cricket-banner a {
-            color: #00d2ff;
+        .sports-banner h3 {
+            color: #38bdf8;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .sports-banner p {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .sports-banner .btn-live {
+            background: #00d2ff;
+            color: #000000;
             text-decoration: none;
             font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            font-size: 14px;
         }
 
         .movies-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
             gap: 15px;
             padding: 15px;
         }
 
         .movie-card {
-            background: #1e293b;
-            border-radius: 10px;
+            background: #131c38;
+            border-radius: 8px;
             overflow: hidden;
-            transition: transform 0.2s;
             cursor: pointer;
-        }
-
-        .movie-card:hover {
-            transform: scale(1.03);
         }
 
         .movie-card img {
             width: 100%;
-            height: 200px;
+            height: 180px;
             object-fit: cover;
         }
 
         .movie-info {
-            padding: 10px;
+            padding: 8px;
         }
 
         .movie-info h3 {
-            font-size: 14px;
+            font-size: 13px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .movie-info p {
-            font-size: 12px;
+            font-size: 11px;
             color: #94a3b8;
-            margin-top: 5px;
+            margin-top: 4px;
         }
 
         .games-grid {
@@ -170,8 +194,8 @@
         }
 
         .game-card-small {
-            background: #1e293b;
-            padding: 10px;
+            background: #131c38;
+            padding: 12px;
             border-radius: 10px;
             text-align: center;
             cursor: pointer;
@@ -185,37 +209,37 @@
 
         .game-card-small p {
             font-size: 12px;
-            margin-top: 5px;
+            margin-top: 6px;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="header-top">
-            <div class="logo">RG Cinema</div>
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search Movies, Series..." oninput="handleSearchInput(this.value)">
-                <div id="suggestionsBox" class="suggestions-box"></div>
-            </div>
+        <div class="logo">⚡ FlashInfo</div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search Movies or Web Series..." oninput="handleSearchInput(this.value)">
+            <button onclick="performSearch()">Search</button>
+            <div id="suggestionsBox" class="suggestions-box"></div>
         </div>
-        <nav>
+        <div class="nav-buttons">
+            <button onclick="filterType('movie')">🎬 Movies</button>
+            <button onclick="filterType('tv')">📺 Web Series</button>
             <button class="active" onclick="filterLanguage('te', this)">Telugu</button>
             <button onclick="filterLanguage('hi', this)">Hindi</button>
             <button onclick="filterLanguage('en', this)">English</button>
             <button onclick="filterLanguage('kn', this)">Kannada</button>
-            <button onclick="filterType('tv')">Web Series</button>
-            <button onclick="showGamesSection()">🎮 Games</button>
-        </nav>
+            <button onclick="showGamesSection()">🎮 Free Games</button>
+        </div>
     </header>
 
-    <div class="cricket-banner" id="cricketBanner">
-        <h3 style="color: #00d2ff; margin-bottom: 5px;">🏏 Live Cricket Updates</h3>
-        <p style="color: #cbd5e1; margin-bottom: 10px;">Get instant live scores & match updates directly on Cricbuzz.</p>
-        <a href="https://m.cricbuzz.com/cricket-match/live-scores" target="_blank">View Live Scores & Updates 🚀</a>
+    <div class="sports-banner">
+        <h3>🏏 FlashInfo Sports: Live Cricket Updates</h3>
+        <p>Get instant live scores, upcoming match schedules & latest news directly on Cricbuzz.</p>
+        <a href="https://m.cricbuzz.com/cricket-match/live-scores" target="_blank" class="btn-live">View Live Scores & Updates 🚀</a>
     </div>
 
-    <!-- Main Containers -->
+    <!-- Content Containers -->
     <div id="moviesContainer" class="movies-grid"></div>
     <div id="gamesContainer" style="display:none;"></div>
 
@@ -231,7 +255,7 @@
             fetchContent(currentMediaType, currentLang);
         };
 
-        // 1. Fetch Movies & Web Series
+        // Fetch Movies & Series
         async function fetchContent(type = 'movie', lang = currentLang) {
             currentMediaType = type;
             
@@ -253,7 +277,7 @@
                 const data = await res.json();
                 displayItems(data.results, type);
             } catch (err) {
-                if (moviesCont) moviesCont.innerHTML = '<p style="color:red; text-align:center; grid-column: 1/-1;">Error loading content!</p>';
+                if (moviesCont) moviesCont.innerHTML = '<p style="color:red; text-align:center; grid-column:1/-1;">Error loading content!</p>';
             }
         }
 
@@ -263,14 +287,14 @@
 
         function filterLanguage(lang, btn) {
             if (btn) {
-                document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.nav-buttons button').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
             }
             currentLang = lang;
             fetchContent(currentMediaType, lang);
         }
 
-        // 2. Search Box Live Suggestions
+        // Live Search Suggestions
         async function handleSearchInput(query) {
             const box = document.getElementById('suggestionsBox');
             if (!box) return;
@@ -304,7 +328,14 @@
             }
         }
 
-        // 3. Display Movies / Web Series
+        function performSearch() {
+            const query = document.getElementById('searchInput').value;
+            if (query) {
+                handleSearchInput(query);
+            }
+        }
+
+        // Display Items
         function displayItems(items, type) {
             const container = document.getElementById('moviesContainer');
             if (!container) return;
@@ -312,7 +343,7 @@
             container.innerHTML = '';
 
             if (!items || items.length === 0) {
-                container.innerHTML = '<p style="color:#fff; text-align:center; grid-column: 1/-1;">No content found.</p>';
+                container.innerHTML = '<p style="color:#fff; text-align:center; grid-column:1/-1;">No content found.</p>';
                 return;
             }
 
@@ -334,7 +365,7 @@
             });
         }
 
-        // 4. Games Section
+        // Games Section
         const gameList = [
             { name: "2048 Classic", icon: "https://play-lh.googleusercontent.com/mO_k9F3S0N7Z3o8dI4dC0x0444.png", url: "https://play2048.co/" },
             { name: "Snake Game", icon: "https://via.placeholder.com/60?text=Snake", url: "https://playsnake.org/" },
@@ -378,4 +409,5 @@
     </script>
 </body>
 </html>
+
   
