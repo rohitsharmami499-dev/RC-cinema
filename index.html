@@ -1,309 +1,381 @@
-<!DOCTYPE html>
-<html lang="te">
+   <!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlashInfo - Movies, OTT & Cricket Updates</title>
+    <title>RG Cinema - Movies & Games</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #0f172a; color: #f8fafc; }
-        
-        /* Header & Nav */
-        header { background: #1e293b; padding: 15px 20px; text-align: center; border-bottom: 2px solid #eab308; position: sticky; top: 0; z-index: 100; }
-        h1 { color: #eab308; margin-bottom: 10px; font-size: 26px; }
-        
-        /* Search Box */
-        .search-box { margin: 10px auto; max-width: 500px; display: flex; gap: 5px; }
-        .search-box input { flex: 1; padding: 10px; border-radius: 5px; border: none; outline: none; }
-        .search-box button { padding: 10px 15px; background: #eab308; color: #0f172a; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
 
-        /* Navigation Categories */
-        nav { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
-        nav button { background: #334155; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: 0.3s; }
-        nav button:hover, nav button.active { background: #eab308; color: #0f172a; font-weight: bold; }
+        body {
+            background-color: #0f172a;
+            color: #ffffff;
+        }
 
-        /* Cricket Section */
-        .cricket-banner { background: #15803d; color: #fff; padding: 10px; text-align: center; font-size: 14px; margin: 15px 20px; border-radius: 8px; }
+        header {
+            background: #1e293b;
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
 
-        /* Movies Grid */
-        .container { padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
-        .movie-card { background: #1e293b; border-radius: 8px; overflow: hidden; position: relative; transition: transform 0.2s; cursor: pointer; }
-        .movie-card:hover { transform: translateY(-5px); }
-        .movie-card img { width: 100%; height: 260px; object-fit: cover; }
-        .movie-info { padding: 10px; }
-        .movie-title { font-size: 14px; font-weight: bold; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .movie-meta { font-size: 12px; color: #94a3b8; display: flex; justify-content: space-between; }
-        .rating { color: #f59e0b; font-weight: bold; }
-        .ott-badge { display: inline-block; background: #0284c7; color: white; font-size: 11px; padding: 3px 6px; border-radius: 4px; margin-top: 5px; }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
 
-        /* Modal for Movie Details */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: #1e293b; padding: 20px; border-radius: 10px; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; color: #fff; }
-        .close-btn { float: right; font-size: 22px; cursor: pointer; color: #ef4444; font-weight: bold; }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00d2ff;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: none;
+            outline: none;
+            background: #334155;
+            color: #fff;
+        }
+
+        .suggestions-box {
+            position: absolute;
+            top: 45px;
+            left: 0;
+            width: 100%;
+            background: #1e293b;
+            border-radius: 8px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .suggestion-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #334155;
+        }
+
+        .suggestion-item:hover {
+            background: #334155;
+        }
+
+        nav {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        nav button {
+            background: #334155;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: 0.3s;
+        }
+
+        nav button.active, nav button:hover {
+            background: #00d2ff;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .cricket-banner {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 1px solid #334155;
+            padding: 15px;
+            margin: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .cricket-banner a {
+            color: #00d2ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            padding: 15px;
+        }
+
+        .movie-card {
+            background: #1e293b;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.03);
+        }
+
+        .movie-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .movie-info {
+            padding: 10px;
+        }
+
+        .movie-info h3 {
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .movie-info p {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+            padding: 15px;
+        }
+
+        .game-card-small {
+            background: #1e293b;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .game-card-small img {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+        }
+
+        .game-card-small p {
+            font-size: 12px;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>⚡ FlashInfo</h1>
-        <div style="position: relative; max-width: 500px; margin: 0 auto;">
-    <input type="text" id="searchInput" placeholder="Search Movies or Web Series..." oninput="handleSearchInput(this.value)">
-    <button onclick="performSearch()">Search</button>
-    <div id="suggestionsBox" class="suggestions-box"></div>
-</div>
-
+        <div class="header-top">
+            <div class="logo">RG Cinema</div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search Movies, Series..." oninput="handleSearchInput(this.value)">
+                <div id="suggestionsBox" class="suggestions-box"></div>
+            </div>
+        </div>
         <nav>
-    <button onclick="filterType('movie')">🎬 Movies</button>
-<button onclick="filterType('tv')">📺 Web Series</button>
-<button class="active" onclick="filterLanguage('te', this)">Telugu</button>
-<button onclick="filterLanguage('hi', this)">Hindi</button>
-<button onclick="filterLanguage('en', this)">English</button>
-<button onclick="filterLanguage('kn', this)">Kannada</button>
-<button onclick="showGamesSection()">🎮 Free Games</button>
-            
-</nav>
-
+            <button class="active" onclick="filterLanguage('te', this)">Telugu</button>
+            <button onclick="filterLanguage('hi', this)">Hindi</button>
+            <button onclick="filterLanguage('en', this)">English</button>
+            <button onclick="filterLanguage('kn', this)">Kannada</button>
+            <button onclick="filterType('tv')">Web Series</button>
+            <button onclick="showGamesSection()">🎮 Games</button>
+        </nav>
     </header>
 
-<div class="cricket-banner" id="cricketBox" style="margin: 20px auto; max-width: 1000px; padding: 25px; background: #1a233a; border-radius: 12px; text-align: center; border: 1px solid #2a3756;">
-    <h3 style="color: #00d2ff; margin-bottom: 10px;">🏏 FlashInfo Sports: Live Cricket Updates</h3>
-    <p style="color: #cbd5e1; margin-bottom: 15px;">Get instant live scores, upcoming match schedules & latest news directly on Cricbuzz.</p>
-    <a href="https://m.cricbuzz.com/cricket-match/live-scores" target="_blank" style="display: inline-block; padding: 12px 24px; background: #00d2ff; color: #0f172a; font-weight: bold; text-decoration: none; border-radius: 8px;">
-        View Live Scores & Updates 🚀
-    </a>
-</div>
-
-
-
-    <div class="container" id="moviesContainer">
-        <!-- Movies will load automatically here -->
+    <div class="cricket-banner" id="cricketBanner">
+        <h3 style="color: #00d2ff; margin-bottom: 5px;">🏏 Live Cricket Updates</h3>
+        <p style="color: #cbd5e1; margin-bottom: 10px;">Get instant live scores & match updates directly on Cricbuzz.</p>
+        <a href="https://m.cricbuzz.com/cricket-match/live-scores" target="_blank">View Live Scores & Updates 🚀</a>
     </div>
-<!-- Free Games Section -->
-<div id="gamesContainer" style="display: none; max-width: 1000px; margin: 20px auto; padding: 20px; background: #1a233a; border-radius: 12px; color: #fff; text-align: center;">
-    <h2 style="color: #00d2ff; margin-bottom: 10px;">🎮 FlashInfo Arcade & Retro Games</h2>
-    <p style="color: #cbd5e1; margin-bottom: 20px;">Play classic phone video games for free right inside your browser!</p>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px;">
-        <div style="background: #0f172a; padding: 10px; border-radius: 8px;">
-            <h4 style="margin: 5px 0;">🔢 2048 Classic</h4>
-            <iframe src="https://play2048.co/" style="width: 100%; height: 350px; border: none; border-radius: 8px;"></iframe>
-        </div>
-
-        <div style="background: #0f172a; padding: 10px; border-radius: 8px;">
-            <h4 style="margin: 5px 0;">🕹️ Snake & Arcade Games</h4>
-            <iframe src="https://m.playsnake.org/" style="width: 100%; height: 350px; border: none; border-radius: 8px;"></iframe>
-        </div>
-    </div>
-</div>
-
-    <!-- Details Modal -->
-    <div class="modal" id="movieModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
-            <div id="modalDetails"></div>
-        </div>
-    </div>
+    <!-- Main Containers -->
+    <div id="moviesContainer" class="movies-grid"></div>
+    <div id="gamesContainer" style="display:none;"></div>
 
     <script>
-      const API_KEY = '59973be85848763e326b1d4372b7c3e2';
-      const BASE_URL = 'https://api.themoviedb.org/3';
-        const IMG_URL = 'https://image.tmdb.org/t/p/w500';
+        const API_KEY = '59973be85848763e326b1c3ef9461129';
+        const BASE_URL = 'https://api.themoviedb.org/3';
+        const IMG_URL = 'https://image.tmdb.org/t3/p/w500';
 
         let currentLang = 'te';
-let currentMediaType = 'movie';
+        let currentMediaType = 'movie';
 
-window.onload = () => {
-    fetchContent(currentMediaType, currentLang);
-};
+        window.onload = () => {
+            fetchContent(currentMediaType, currentLang);
+        };
 
-// 1. Movies / Web Series Fetching Logic (సీరియల్స్ లేకుండా ఓన్లీ వెబ్ సిరీస్)
-async function fetchContent(type = 'movie', lang = currentLang) {
-    currentMediaType = type;
-    document.getElementById("gamesContainer").style.display = "none";
-    document.getElementById("moviesContainer").style.display = "grid";
-
-    let endpoint = '';
-    if (type === 'tv') {
-        endpoint = `${BASE_URL}/discover/tv?api_key=${API_KEY}&with_original_language=${lang}&sort_by=popularity.desc&without_genres=10766,10763,10767`; 
-    } else {
-        endpoint = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=${lang}&sort_by=popularity.desc`;
-    }
-
-    try {
-        const res = await fetch(endpoint);
-        const data = await res.json();
-        displayItems(data.results, type);
-    } catch (err) {
-        document.getElementById('moviesContainer').innerHTML = '<p style="color:red; text-align:center;">Error loading content!</p>';
-    }
-}
-
-function filterType(type) {
-    fetchContent(type, currentLang);
-}
-
-function filterLanguage(lang, btn) {
-    if (btn) {
-        document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-    }
-    currentLang = lang;
-    fetchContent(currentMediaType, lang);
-}
-
-// 2. Search Box Live Suggestions Logic
-async function handleSearchInput(query) {
-    const box = document.getElementById('suggestionsBox');
-    if (!query || query.trim().length < 2) {
-        box.innerHTML = '';
-        return;
-    }
-
-    try {
-        const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
-        const data = await res.json();
-        
-        const filtered = (data.results || []).filter(item => item.media_type === 'movie' || item.media_type === 'tv').slice(0, 5);
-        
-        box.innerHTML = '';
-        filtered.forEach(item => {
-            const title = item.title || item.name;
-            const img = item.poster_path ? IMG_URL + item.poster_path : 'https://via.placeholder.com/40';
-            const div = document.createElement('div');
-            div.className = 'suggestion-item';
-            div.innerHTML = `<img src="${img}" style="width:30px; height:40px; border-radius:4px;"> <span>${title} (${item.media_type === 'tv' ? 'Series' : 'Movie'})</span>`;
-            div.onclick = () => {
-                showDetails(item.id, item.media_type);
-                box.innerHTML = '';
-            };
-            box.appendChild(div);
-        });
-    } catch(e) {
-        box.innerHTML = '';
-    }
-}
-
-function performSearch() {
-    const query = document.getElementById('searchInput').value;
-    if (query) {
-        handleSearchInput(query);
-    }
-}
-
-// 3. Display Items Logic
-function displayItems(items, type) {
-    const container = document.getElementById('moviesContainer');
-    container.innerHTML = '';
-
-    if (!items || items.length === 0) {
-        container.innerHTML = '<p style="color:#fff; text-align:center;">No content found.</p>';
-        return;
-    }
-
-    items.forEach(item => {
-        const title = type === 'tv' ? item.name : item.title;
-        const release = type === 'tv' ? item.first_air_date : item.release_date;
-        const card = document.createElement('div');
-        card.className = 'movie-card';
-        card.onclick = () => showDetails(item.id, type);
-
-        card.innerHTML = `
-            <img src="${item.poster_path ? IMG_URL + item.poster_path : 'https://via.placeholder.com/500x750?text=No+Poster'}" alt="${title}">
-            <div class="movie-info">
-                <h3>${title}</h3>
-                <p>⭐ ${item.vote_average ? item.vote_average.toFixed(1) : 'N/A'} | 📅 ${release || 'N/A'}</p>
-            </div>
-        `;
-        container.appendChild(card);
-    });
-}
-
-// 4. Compact Games Section (యాప్ ఐకాన్ల మోడల్)
-const gameList = [
-    { name: "2048 Classic", icon: "https://play-lh.googleusercontent.com/mO_k9F3S0N7Z3o8dI4dC0x0444.png", url: "https://play2048.co/" },
-    { name: "Snake Game", icon: "https://play-lh.googleusercontent.com/97-1uEaP6a80444.png", url: "https://playsnake.org/" },
-    { name: "Tic Tac Toe", icon: "https://play-lh.googleusercontent.com/tictactoe.png", url: "https://playtictactoe.org/" }
-];
-
-function showGamesSection() {
-    document.getElementById("moviesContainer").style.display = "none";
-    const gamesCont = document.getElementById("gamesContainer");
-    gamesCont.style.display = "block";
-    
-    gamesCont.innerHTML = `
-        <h2 style="color:#fff; text-align:center; margin:15px 0;">🎮 Free Mobile Games</h2>
-        <div class="games-grid">
-            ${gameList.map(g => `
-                <div class="game-card-small" onclick="openGameModal('${g.url}')">
-                    <img src="${g.icon}" onerror="this.src='https://via.placeholder.com/60?text=Game'">
-                    <p>${g.name}</p>
-                </div>
-            `).join('')}
-        </div>
-        <div id="gameModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000;">
-            <button onclick="closeGameModal()" style="position:absolute; top:10px; right:10px; background:red; color:#fff; border:none; padding:8px 15px; border-radius:5px; font-weight:bold;">❌ Close Game</button>
-            <iframe id="gameIframe" style="width:100%; height:100%; border:none;"></iframe>
-        </div>
-    `;
-}
-
-function openGameModal(url) {
-    document.getElementById('gameIframe').src = url;
-    document.getElementById('gameModal').style.display = 'block';
-}
-
-function closeGameModal() {
-    document.getElementById('gameIframe').src = '';
-    document.getElementById('gameModal').style.display = 'none';
-}
-
-}
-
-
-        async function showDetails(movieId) {
-            const modal = document.getElementById('movieModal');
-            const detailsDiv = document.getElementById('modalDetails');
+        // 1. Fetch Movies & Web Series
+        async function fetchContent(type = 'movie', lang = currentLang) {
+            currentMediaType = type;
             
-            const providerRes = await fetch(`${BASE_URL}/movie/${movieId}/watch/providers?api_key=${API_KEY}`);
-            const providerData = await providerRes.json();
-            const inProviders = providerData.results?.IN;
+            const gamesCont = document.getElementById("gamesContainer");
+            const moviesCont = document.getElementById("moviesContainer");
+            
+            if (gamesCont) gamesCont.style.display = "none";
+            if (moviesCont) moviesCont.style.display = "grid";
 
-            let ottInfo = '<p style="margin-top:10px;"><b>OTT Availability (India):</b> Information not updated yet / Theatres only.</p>';
-            if (inProviders) {
-                if (inProviders.flatrate) {
-                    const platforms = inProviders.flatrate.map(p => p.provider_name).join(', ');
-                    ottInfo = `<p style="color:#22c55e; margin-top:10px;"><b>Subscription / Paid Stream:</b> ${platforms}</p>`;
-                } else if (inProviders.free) {
-                    const freePlatforms = inProviders.free.map(p => p.provider_name).join(', ');
-                    ottInfo = `<p style="color:#38bdf8; margin-top:10px;"><b>Free Stream Available On:</b> ${freePlatforms}</p>`;
-                } else if (inProviders.rent) {
-                    const rentPlatforms = inProviders.rent.map(p => p.provider_name).join(', ');
-                    ottInfo = `<p style="color:#f59e0b; margin-top:10px;"><b>Available for Rent:</b> ${rentPlatforms}</p>`;
-                }
+            let endpoint = '';
+            if (type === 'tv') {
+                endpoint = `${BASE_URL}/discover/tv?api_key=${API_KEY}&with_original_language=${lang}&sort_by=popularity.desc&without_genres=10766,10763,10767`; 
+            } else {
+                endpoint = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=${lang}&sort_by=popularity.desc`;
             }
 
-            const movieRes = await fetch(`${BASE_URL}/movie/${movieId}?api_key=${API_KEY}`);
-            const movie = await movieRes.json();
-
-            detailsDiv.innerHTML = `
-                <h2>${movie.title}</h2>
-                <p style="margin: 10px 0; color: #cbd5e1; font-size:14px; line-height:1.4;">${movie.overview || 'Story overview not available.'}</p>
-                <hr style="margin: 10px 0; border-color: #334155;">
-                ${ottInfo}
-                <p style="margin-top: 10px;"><b>Rating:</b> ⭐ ${movie.vote_average.toFixed(1)}/10</p>
-                <p style="margin-top: 5px;"><b>Release Date:</b> ${movie.release_date}</p>
-            `;
-            modal.style.display = 'flex';
+            try {
+                const res = await fetch(endpoint);
+                const data = await res.json();
+                displayItems(data.results, type);
+            } catch (err) {
+                if (moviesCont) moviesCont.innerHTML = '<p style="color:red; text-align:center; grid-column: 1/-1;">Error loading content!</p>';
+            }
         }
 
-        function closeModal() {
-            document.getElementById('movieModal').style.display = 'none';
+        function filterType(type) {
+            fetchContent(type, currentLang);
         }
 
-        function showCricketAlert() {
-    document.getElementById("cricketBox").scrollIntoView({ behavior: "smooth" });
-}
+        function filterLanguage(lang, btn) {
+            if (btn) {
+                document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+            currentLang = lang;
+            fetchContent(currentMediaType, lang);
+        }
 
+        // 2. Search Box Live Suggestions
+        async function handleSearchInput(query) {
+            const box = document.getElementById('suggestionsBox');
+            if (!box) return;
+            
+            if (!query || query.trim().length < 2) {
+                box.innerHTML = '';
+                return;
+            }
+
+            try {
+                const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+                const data = await res.json();
+                
+                const filtered = (data.results || []).filter(item => item.media_type === 'movie' || item.media_type === 'tv').slice(0, 5);
+                
+                box.innerHTML = '';
+                filtered.forEach(item => {
+                    const title = item.title || item.name;
+                    const img = item.poster_path ? IMG_URL + item.poster_path : 'https://via.placeholder.com/40';
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item';
+                    div.innerHTML = `<img src="${img}" style="width:30px; height:40px; border-radius:4px;"> <span>${title} (${item.media_type === 'tv' ? 'Series' : 'Movie'})</span>`;
+                    div.onclick = () => {
+                        alert(`Selected: ${title}`);
+                        box.innerHTML = '';
+                    };
+                    box.appendChild(div);
+                });
+            } catch(e) {
+                box.innerHTML = '';
+            }
+        }
+
+        // 3. Display Movies / Web Series
+        function displayItems(items, type) {
+            const container = document.getElementById('moviesContainer');
+            if (!container) return;
+            
+            container.innerHTML = '';
+
+            if (!items || items.length === 0) {
+                container.innerHTML = '<p style="color:#fff; text-align:center; grid-column: 1/-1;">No content found.</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                const title = type === 'tv' ? item.name : item.title;
+                const release = type === 'tv' ? item.first_air_date : item.release_date;
+                const card = document.createElement('div');
+                card.className = 'movie-card';
+                card.onclick = () => alert(`Movie: ${title}`);
+
+                card.innerHTML = `
+                    <img src="${item.poster_path ? IMG_URL + item.poster_path : 'https://via.placeholder.com/500x750?text=No+Poster'}" alt="${title}">
+                    <div class="movie-info">
+                        <h3>${title}</h3>
+                        <p>⭐ ${item.vote_average ? item.vote_average.toFixed(1) : 'N/A'} | 📅 ${release || 'N/A'}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 4. Games Section
+        const gameList = [
+            { name: "2048 Classic", icon: "https://play-lh.googleusercontent.com/mO_k9F3S0N7Z3o8dI4dC0x0444.png", url: "https://play2048.co/" },
+            { name: "Snake Game", icon: "https://via.placeholder.com/60?text=Snake", url: "https://playsnake.org/" },
+            { name: "Tic Tac Toe", icon: "https://via.placeholder.com/60?text=TicTacToe", url: "https://playtictactoe.org/" }
+        ];
+
+        function showGamesSection() {
+            const moviesCont = document.getElementById("moviesContainer");
+            const gamesCont = document.getElementById("gamesContainer");
+            
+            if (moviesCont) moviesCont.style.display = "none";
+            if (gamesCont) {
+                gamesCont.style.display = "block";
+                gamesCont.innerHTML = `
+                    <h2 style="color:#fff; text-align:center; margin:15px 0;">🎮 Free Mobile Games</h2>
+                    <div class="games-grid">
+                        ${gameList.map(g => `
+                            <div class="game-card-small" onclick="openGameModal('${g.url}')">
+                                <img src="${g.icon}">
+                                <p>${g.name}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div id="gameModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000;">
+                        <button onclick="closeGameModal()" style="position:absolute; top:10px; right:10px; background:red; color:#fff; border:none; padding:8px 15px; border-radius:5px; font-weight:bold; cursor:pointer;">❌ Close Game</button>
+                        <iframe id="gameIframe" style="width:100%; height:100%; border:none;"></iframe>
+                    </div>
+                `;
+            }
+        }
+
+        function openGameModal(url) {
+            document.getElementById('gameIframe').src = url;
+            document.getElementById('gameModal').style.display = 'block';
+        }
+
+        function closeGameModal() {
+            document.getElementById('gameIframe').src = '';
+            document.getElementById('gameModal').style.display = 'none';
+        }
     </script>
 </body>
 </html>
+  
