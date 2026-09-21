@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -186,30 +186,30 @@
             margin-top: 4px;
         }
 
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 15px;
-            padding: 15px;
-        }
-
-        .game-card-small {
-            background: #131c38;
-            padding: 12px;
-            border-radius: 10px;
+        /* Embedded Games Container */
+        .games-container {
+            padding: 20px;
             text-align: center;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 80px);
+            gap: 5px;
+            margin: 20px auto;
+            width: 250px;
+        }
+
+        .cell {
+            width: 80px;
+            height: 80px;
+            background: #1e293b;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-        }
-
-        .game-card-small img {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-        }
-
-        .game-card-small p {
-            font-size: 12px;
-            margin-top: 6px;
+            border-radius: 8px;
         }
     </style>
 </head>
@@ -223,8 +223,8 @@
             <div id="suggestionsBox" class="suggestions-box"></div>
         </div>
         <div class="nav-buttons">
-            <button onclick="filterType('movie')">🎬 Movies</button>
-            <button onclick="filterType('tv')">📺 Web Series</button>
+            <button onclick="filterCategory('movie')">🎬 Movies</button>
+            <button onclick="filterCategory('tv')">📺 Web Series</button>
             <button class="active" onclick="filterLanguage('te', this)">Telugu</button>
             <button onclick="filterLanguage('hi', this)">Hindi</button>
             <button onclick="filterLanguage('en', this)">English</button>
@@ -239,50 +239,50 @@
         <a href="https://m.cricbuzz.com/cricket-match/live-scores" target="_blank" class="btn-live">View Live Scores & Updates 🚀</a>
     </div>
 
-    <!-- Content Containers -->
+    <!-- Content Areas -->
     <div id="moviesContainer" class="movies-grid"></div>
-    <div id="gamesContainer" style="display:none;"></div>
+    <div id="gamesContainer" class="games-container" style="display:none;"></div>
 
     <script>
         const API_KEY = '59973be85848763e326b1c3ef9461129';
         const BASE_URL = 'https://api.themoviedb.org/3';
         const IMG_URL = 'https://image.tmdb.org/t3/p/w500';
 
+        let currentType = 'movie';
         let currentLang = 'te';
-        let currentMediaType = 'movie';
 
         window.onload = () => {
-            fetchContent(currentMediaType, currentLang);
+            fetchContent();
         };
 
-        // Fetch Movies & Series
-        async function fetchContent(type = 'movie', lang = currentLang) {
-            currentMediaType = type;
-            
-            const gamesCont = document.getElementById("gamesContainer");
+        async function fetchContent() {
+            document.getElementById("gamesContainer").style.display = "none";
             const moviesCont = document.getElementById("moviesContainer");
-            
-            if (gamesCont) gamesCont.style.display = "none";
-            if (moviesCont) moviesCont.style.display = "grid";
+            moviesCont.style.display = "grid";
+            moviesCont.innerHTML = '<p style="text-align:center; grid-column:1/-1;">Loading...</p>';
 
-            let endpoint = '';
-            if (type === 'tv') {
-                endpoint = `${BASE_URL}/discover/tv?api_key=${API_KEY}&with_original_language=${lang}&sort_by=popularity.desc&without_genres=10766,10763,10767`; 
-            } else {
-                endpoint = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=${lang}&sort_by=popularity.desc`;
-            }
+            let url = `${BASE_URL}/discover/${currentType}?api_key=${API_KEY}&with_original_language=${currentLang}&sort_by=popularity.desc`;
 
             try {
-                const res = await fetch(endpoint);
-                const data = await res.json();
-                displayItems(data.results, type);
+                let res = await fetch(url);
+                let data = await res.json();
+                
+                // Fallback if language API gives empty list
+                if (!data.results || data.results.length === 0) {
+                    url = `${BASE_URL}/${currentType}/popular?api_key=${API_KEY}`;
+                    res = await fetch(url);
+                    data = await res.json();
+                }
+
+                displayItems(data.results);
             } catch (err) {
-                if (moviesCont) moviesCont.innerHTML = '<p style="color:red; text-align:center; grid-column:1/-1;">Error loading content!</p>';
+                moviesCont.innerHTML = '<p style="color:red; text-align:center; grid-column:1/-1;">Error loading data!</p>';
             }
         }
 
-        function filterType(type) {
-            fetchContent(type, currentLang);
+        function filterCategory(type) {
+            currentType = type;
+            fetchContent();
         }
 
         function filterLanguage(lang, btn) {
@@ -291,14 +291,37 @@
                 btn.classList.add('active');
             }
             currentLang = lang;
-            fetchContent(currentMediaType, lang);
+            fetchContent();
         }
 
-        // Live Search Suggestions
+        function displayItems(items) {
+            const container = document.getElementById('moviesContainer');
+            container.innerHTML = '';
+
+            if (!items || items.length === 0) {
+                container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">No content found.</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                const title = item.title || item.name;
+                const release = item.release_date || item.first_air_date || 'N/A';
+                const card = document.createElement('div');
+                card.className = 'movie-card';
+                card.innerHTML = `
+                    <img src="${item.poster_path ? IMG_URL + item.poster_path : 'https://via.placeholder.com/500x750?text=No+Poster'}" alt="${title}">
+                    <div class="movie-info">
+                        <h3>${title}</h3>
+                        <p>⭐ ${item.vote_average ? item.vote_average.toFixed(1) : 'N/A'} | 📅 ${release}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Live Search
         async function handleSearchInput(query) {
             const box = document.getElementById('suggestionsBox');
-            if (!box) return;
-            
             if (!query || query.trim().length < 2) {
                 box.innerHTML = '';
                 return;
@@ -307,18 +330,17 @@
             try {
                 const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
                 const data = await res.json();
-                
-                const filtered = (data.results || []).filter(item => item.media_type === 'movie' || item.media_type === 'tv').slice(0, 5);
+                const filtered = (data.results || []).slice(0, 5);
                 
                 box.innerHTML = '';
                 filtered.forEach(item => {
                     const title = item.title || item.name;
-                    const img = item.poster_path ? IMG_URL + item.poster_path : 'https://via.placeholder.com/40';
+                    if (!title) return;
                     const div = document.createElement('div');
                     div.className = 'suggestion-item';
-                    div.innerHTML = `<img src="${img}" style="width:30px; height:40px; border-radius:4px;"> <span>${title} (${item.media_type === 'tv' ? 'Series' : 'Movie'})</span>`;
+                    div.innerHTML = `<span>${title}</span>`;
                     div.onclick = () => {
-                        alert(`Selected: ${title}`);
+                        displayItems([item]);
                         box.innerHTML = '';
                     };
                     box.appendChild(div);
@@ -330,84 +352,40 @@
 
         function performSearch() {
             const query = document.getElementById('searchInput').value;
-            if (query) {
-                handleSearchInput(query);
-            }
+            if(query) handleSearchInput(query);
         }
 
-        // Display Items
-        function displayItems(items, type) {
-            const container = document.getElementById('moviesContainer');
-            if (!container) return;
-            
-            container.innerHTML = '';
-
-            if (!items || items.length === 0) {
-                container.innerHTML = '<p style="color:#fff; text-align:center; grid-column:1/-1;">No content found.</p>';
-                return;
-            }
-
-            items.forEach(item => {
-                const title = type === 'tv' ? item.name : item.title;
-                const release = type === 'tv' ? item.first_air_date : item.release_date;
-                const card = document.createElement('div');
-                card.className = 'movie-card';
-                card.onclick = () => alert(`Movie: ${title}`);
-
-                card.innerHTML = `
-                    <img src="${item.poster_path ? IMG_URL + item.poster_path : 'https://via.placeholder.com/500x750?text=No+Poster'}" alt="${title}">
-                    <div class="movie-info">
-                        <h3>${title}</h3>
-                        <p>⭐ ${item.vote_average ? item.vote_average.toFixed(1) : 'N/A'} | 📅 ${release || 'N/A'}</p>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // Games Section
-        const gameList = [
-            { name: "2048 Classic", icon: "https://play-lh.googleusercontent.com/mO_k9F3S0N7Z3o8dI4dC0x0444.png", url: "https://play2048.co/" },
-            { name: "Snake Game", icon: "https://via.placeholder.com/60?text=Snake", url: "https://playsnake.org/" },
-            { name: "Tic Tac Toe", icon: "https://via.placeholder.com/60?text=TicTacToe", url: "https://playtictactoe.org/" }
-        ];
+        // Tic Tac Toe Embedded Game
+        let board = ["", "", "", "", "", "", "", "", ""];
+        let currentPlayer = "❌";
 
         function showGamesSection() {
-            const moviesCont = document.getElementById("moviesContainer");
+            document.getElementById("moviesContainer").style.display = "none";
             const gamesCont = document.getElementById("gamesContainer");
+            gamesCont.style.display = "block";
             
-            if (moviesCont) moviesCont.style.display = "none";
-            if (gamesCont) {
-                gamesCont.style.display = "block";
-                gamesCont.innerHTML = `
-                    <h2 style="color:#fff; text-align:center; margin:15px 0;">🎮 Free Mobile Games</h2>
-                    <div class="games-grid">
-                        ${gameList.map(g => `
-                            <div class="game-card-small" onclick="openGameModal('${g.url}')">
-                                <img src="${g.icon}">
-                                <p>${g.name}</p>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div id="gameModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000;">
-                        <button onclick="closeGameModal()" style="position:absolute; top:10px; right:10px; background:red; color:#fff; border:none; padding:8px 15px; border-radius:5px; font-weight:bold; cursor:pointer;">❌ Close Game</button>
-                        <iframe id="gameIframe" style="width:100%; height:100%; border:none;"></iframe>
-                    </div>
-                `;
-            }
+            gamesCont.innerHTML = `
+                <h2>🎮 Tic Tac Toe Game</h2>
+                <h3 id="gameStatus" style="margin-top:10px;">Turn: ${currentPlayer}</h3>
+                <div class="game-board">
+                    ${board.map((val, idx) => `<div class="cell" onclick="makeMove(${idx})">${val}</div>`).join('')}
+                </div>
+                <button onclick="resetGame()" style="padding:8px 16px; background:#eab308; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">Restart Game</button>
+            `;
         }
 
-        function openGameModal(url) {
-            document.getElementById('gameIframe').src = url;
-            document.getElementById('gameModal').style.display = 'block';
+        function makeMove(index) {
+            if (board[index] !== "") return;
+            board[index] = currentPlayer;
+            currentPlayer = currentPlayer === "❌" ? "⭕" : "❌";
+            showGamesSection();
         }
 
-        function closeGameModal() {
-            document.getElementById('gameIframe').src = '';
-            document.getElementById('gameModal').style.display = 'none';
+        function resetGame() {
+            board = ["", "", "", "", "", "", "", "", ""];
+            currentPlayer = "❌";
+            showGamesSection();
         }
     </script>
 </body>
 </html>
-
-  
