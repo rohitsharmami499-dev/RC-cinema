@@ -27,12 +27,12 @@
         .sports-banner p { color: #94a3b8; font-size: 12px; margin-bottom: 12px; }
         .sports-banner .btn-live { background: #00d2ff; color: #000000; text-decoration: none; font-weight: bold; padding: 8px 16px; border-radius: 6px; display: inline-block; font-size: 13px; }
 
-        .movies-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; padding: 15px; }
-        .movie-card { background: #131c38; border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
+        .movies-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; padding: 15px; }
+        .movie-card { background: #131c38; border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s; border: 1px solid #1e293b; }
         .movie-card:hover { transform: translateY(-4px); }
-        .movie-card img { width: 100%; height: 190px; object-fit: cover; }
+        .movie-card img { width: 100%; height: 200px; object-fit: cover; }
         .movie-info { padding: 8px; }
-        .movie-info h3 { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .movie-info h3 { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ffffff; }
         .movie-info p { font-size: 11px; color: #94a3b8; margin-top: 4px; }
 
         /* Modal Popup */
@@ -59,14 +59,14 @@
             <div id="suggestionsBox" class="suggestions-box"></div>
         </div>
         <div class="nav-buttons">
-            <button class="active" onclick="filterCategory('movie', this)">🎬 Movies</button>
+            <button onclick="filterCategory('movie', this)">🎬 Movies</button>
             <button onclick="filterCategory('tv', this)">📺 Web Series</button>
-            <button onclick="filterLanguage('te', this)">Telugu</button>
-            <button onclick="filterLanguage('hi', this)">Hindi</button>
-            <button onclick="filterLanguage('en', this)">English</button>
-            <button onclick="filterLanguage('kn', this)">Kannada</button>
-            <button onclick="filterSpecial('marvel', this)">🦸 Marvel</button>
-            <button onclick="filterSpecial('dc', this)">🦇 DC Studio</button>
+            <button class="active" onclick="filterCategory('te', this)">Telugu</button>
+            <button onclick="filterCategory('hi', this)">Hindi</button>
+            <button onclick="filterCategory('en', this)">English</button>
+            <button onclick="filterCategory('kn', this)">Kannada</button>
+            <button onclick="filterCategory('marvel', this)">🦸 Marvel</button>
+            <button onclick="filterCategory('dc', this)">🦇 DC Studio</button>
         </div>
     </header>
 
@@ -88,43 +88,60 @@
             <p id="modalDesc" class="modal-desc"></p>
             <div class="modal-actions">
                 <a id="btnTrailer" class="btn-action btn-trailer" target="_blank">▶ Watch Trailer on YouTube</a>
-                <a id="btnWatch" class="btn-action btn-watch" target="_blank">🔍 Search Streaming Platforms</a>
+                <a id="btnWatch" class="btn-action btn-watch" target="_blank">🔍 Where to Watch / Stream Online</a>
             </div>
         </div>
     </div>
 
     <script>
-        const API_KEY = '59973be85848763e326b1c3ef9461129';
-        const BASE_URL = 'https://api.themoviedb.org/3';
-        const IMG_URL = 'https://image.tmdb.org/t3/p/w500';
-
-        let currentType = 'movie';
-        let currentMode = 'category';
-        let currentLang = 'te';
-
-        // Backup List if API blocked on Github Pages
-        const backupData = {
+        // Dedicated Movies Database per Category
+        const movieDatabase = {
             te: [
-                { title: "Kalki 2898 AD", vote_average: 8.5, release_date: "2024", poster_path: "/1X64hN6gVlI0D9E0eT9lFp7uL0J.jpg", backdrop_path: "/1X64hN6gVlI0D9E0eT9lFp7uL0J.jpg", overview: "A modern avatar of Vishnu descends to earth to protect the world from evil forces." },
-                { title: "Devara", vote_average: 8.1, release_date: "2024", poster_path: "/A68nZ5mI6i5FzY2M8u2L8R3p0P.jpg", backdrop_path: "/A68nZ5mI6i5FzY2M8u2L8R3p0P.jpg", overview: "High voltage action saga set in coastal sea regions." },
-                { title: "Pushpa 2: The Rule", vote_average: 8.9, release_date: "2024", poster_path: "/A2nZ5mI6i5FzY2M8u2L8R3p0P.jpg", backdrop_path: "/A2nZ5mI6i5FzY2M8u2L8R3p0P.jpg", overview: "Pushpa Raj continues to reign over the red sandalwood smuggling network." },
-                { title: "Salaar: Part 1", vote_average: 8.3, release_date: "2023", poster_path: "/2L8R3p0P1X64hN6gVlI0D9E0eT.jpg", backdrop_path: "/2L8R3p0P1X64hN6gVlI0D9E0eT.jpg", overview: "A gang leader tries to keep a promise made to his dying friend." }
+                { title: "Kalki 2898 AD", vote_average: 8.5, release_date: "2024", poster_path: "https://image.tmdb.org/t3/p/w500/1X64hN6gVlI0D9E0eT9lFp7uL0J.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/1X64hN6gVlI0D9E0eT9lFp7uL0J.jpg", overview: "A modern avatar of Vishnu descends to earth to protect the world from dystopian forces." },
+                { title: "Devara: Part 1", vote_average: 8.1, release_date: "2024", poster_path: "https://image.tmdb.org/t3/p/w500/A68nZ5mI6i5FzY2M8u2L8R3p0P.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/A68nZ5mI6i5FzY2M8u2L8R3p0P.jpg", overview: "An epic action saga set against forgotten coastal lands." },
+                { title: "Pushpa 2: The Rule", vote_average: 8.9, release_date: "2024", poster_path: "https://image.tmdb.org/t3/p/w500/A2nZ5mI6i5FzY2M8u2L8R3p0P.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/A2nZ5mI6i5FzY2M8u2L8R3p0P.jpg", overview: "Pushpa Raj expands his empire while fighting law enforcement and deadly foes." },
+                { title: "Salaar: Ceasefire", vote_average: 8.3, release_date: "2023", poster_path: "https://image.tmdb.org/t3/p/w500/2L8R3p0P1X64hN6gVlI0D9E0eT.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/2L8R3p0P1X64hN6gVlI0D9E0eT.jpg", overview: "A gang leader tries to fulfill a promise made to his dying friend in Khansaar." },
+                { title: "RRR", vote_average: 8.8, release_date: "2022", poster_path: "https://image.tmdb.org/t3/p/w500/nEu2339uA2nZ5mI6i5FzY2M8u2L.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/nEu2339uA2nZ5mI6i5FzY2M8u2L.jpg", overview: "A tale of two legendary revolutionaries fighting against British colonialists." },
+                { title: "Guntur Kaaram", vote_average: 7.5, release_date: "2024", poster_path: "https://image.tmdb.org/t3/p/w500/3Z9M3N8P2L0K1J2H3G4F5E6a1.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/3Z9M3N8P2L0K1J2H3G4F5E6a1.jpg", overview: "A fiery man navigates complex family ties and political rivalries in Guntur." }
             ],
             hi: [
-                { title: "Stree 2", vote_average: 8.4, release_date: "2024", poster_path: "/8R3p0P1X64hN6gVlI0D9E0eT9.jpg", backdrop_path: "/8R3p0P1X64hN6gVlI0D9E0eT9.jpg", overview: "The town of Chanderi is haunted by a headless monster." },
-                { title: "Jawan", vote_average: 8.2, release_date: "2023", poster_path: "/iA4iI9vL2Y3QzI2l7A8fE4r0M.jpg", backdrop_path: "/iA4iI9vL2Y3QzI2l7A8fE4r0M.jpg", overview: "A high-octane action thriller highlighting social issues." }
+                { title: "Stree 2", vote_average: 8.4, release_date: "2024", poster_path: "https://image.tmdb.org/t3/p/w500/8R3p0P1X64hN6gVlI0D9E0eT9.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/8R3p0P1X64hN6gVlI0D9E0eT9.jpg", overview: "Chanderi faces a new terror from a headless creature known as Sarkata." },
+                { title: "Jawan", vote_average: 8.2, release_date: "2023", poster_path: "https://image.tmdb.org/t3/p/w500/iA4iI9vL2Y3QzI2l7A8fE4r0M.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/iA4iI9vL2Y3QzI2l7A8fE4r0M.jpg", overview: "A man driven by a personal vendetta seeks to rectify wrongs in society." },
+                { title: "Animal", vote_average: 8.0, release_date: "2023", poster_path: "https://image.tmdb.org/t3/p/w500/hrA2nZ5mI6i5FzY2M8u2L8R3p0P.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/hrA2nZ5mI6i5FzY2M8u2L8R3p0P.jpg", overview: "A son's obsessive love for his father leads to bloodshed and vengeance." },
+                { title: "Pathaan", vote_average: 7.9, release_date: "2023", poster_path: "https://image.tmdb.org/t3/p/w500/a2zX9M3N8P2L0K1J2H3G4F5E6.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/a2zX9M3N8P2L0K1J2H3G4F5E6.jpg", overview: "An exiled RAW agent takes on a mercenary outfit plotting an attack on India." }
             ],
             en: [
-                { title: "Deadpool & Wolverine", vote_average: 8.7, release_date: "2024", poster_path: "/8Gxv8K8A2a2C1B2d3E4f5G6h7.jpg", backdrop_path: "/8Gxv8K8A2a2C1B2d3E4f5G6h7.jpg", overview: "Deadpool partners with Wolverine to protect the multiverse." },
-                { title: "Oppenheimer", vote_average: 8.9, release_date: "2023", poster_path: "/t6HIqrRAOXZM23321A8fE4r0M.jpg", backdrop_path: "/t6HIqrRAOXZM23321A8fE4r0M.jpg", overview: "The story of J. Robert Oppenheimer's role in the Manhattan Project." }
+                { title: "Oppenheimer", vote_average: 8.9, release_date: "2023", poster_path: "https://image.tmdb.org/t3/p/w500/8Gxv8K8A2a2C1B2d3E4f5G6h7.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/8Gxv8K8A2a2C1B2d3E4f5G6h7.jpg", overview: "The story of J. Robert Oppenheimer and his role in the Manhattan Project." },
+                { title: "Avatar: The Way of Water", vote_average: 8.8, release_date: "2022", poster_path: "https://image.tmdb.org/t3/p/w500/t6HIqrRAOXZM23321A8fE4r0M.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/t6HIqrRAOXZM23321A8fE4r0M.jpg", overview: "Jake Sully and Neytiri protect Pandora's oceans from human exploitation." },
+                { title: "Interstellar", vote_average: 8.7, release_date: "2014", poster_path: "https://image.tmdb.org/t3/p/w500/gEU2Q321A8fE4r0M8Gxv8K8A2a2.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/gEU2Q321A8fE4r0M8Gxv8K8A2a2.jpg", overview: "Explorers travel through a wormhole in space in an attempt to save humanity." }
             ],
             kn: [
-                { title: "K.G.F: Chapter 2", vote_average: 8.9, release_date: "2022", poster_path: "/q2Z9M3N8P2L0K1J2H3G4F5E6a.jpg", backdrop_path: "/q2Z9M3N8P2L0K1J2H3G4F5E6a.jpg", overview: "Rocky takes over KGF and faces dangerous opponents." },
-                { title: "Kantara", vote_average: 8.7, release_date: "2022", poster_path: "/3Z9M3N8P2L0K1J2H3G4F5E6a1.jpg", backdrop_path: "/3Z9M3N8P2L0K1J2H3G4F5E6a1.jpg", overview: "A human vs nature conflict rooted in traditional culture." }
+                { title: "K.G.F: Chapter 2", vote_average: 9.0, release_date: "2022", poster_path: "https://image.tmdb.org/t3/p/w500/q2Z9M3N8P2L0K1J2H3G4F5E6a.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/q2Z9M3N8P2L0K1J2H3G4F5E6a.jpg", overview: "Rocky takes control of KGF and faces deadly government and underworld foes." },
+                { title: "Kantara", vote_average: 8.8, release_date: "2022", poster_path: "https://image.tmdb.org/t3/p/w500/3Z9M3N8P2L0K1J2H3G4F5E6a1.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/3Z9M3N8P2L0K1J2H3G4F5E6a1.jpg", overview: "A conflict between a village community and forest officials rooted in ritual culture." },
+                { title: "777 Charlie", vote_average: 8.9, release_date: "2022", poster_path: "https://image.tmdb.org/t3/p/w500/8Gxv8K8A2a2C1B2d3E4f5G6h7.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/8Gxv8K8A2a2C1B2d3E4f5G6h7.jpg", overview: "A lonely factory worker finds purpose through his bond with a stray dog." }
+            ],
+            marvel: [
+                { title: "Deadpool & Wolverine", vote_average: 8.7, release_date: "2024", poster_path: "https://image.tmdb.org/t3/p/w500/8Gxv8K8A2a2C1B2d3E4f5G6h7.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/8Gxv8K8A2a2C1B2d3E4f5G6h7.jpg", overview: "Wolverine is recovering from his injuries when he crosses paths with Deadpool." },
+                { title: "Avengers: Endgame", vote_average: 8.9, release_date: "2019", poster_path: "https://image.tmdb.org/t3/p/w500/or06FN3Dka5tukA1A92169M3N8P.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/or06FN3Dka5tukA1A92169M3N8P.jpg", overview: "The surviving Avengers assemble to reverse Thanos' actions and restore balance." },
+                { title: "Spider-Man: No Way Home", vote_average: 8.8, release_date: "2021", poster_path: "https://image.tmdb.org/t3/p/w500/1g0dhY2169M3N8P2L0K1J2H3G4.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/1g0dhY2169M3N8P2L0K1J2H3G4.jpg", overview: "Peter Parker seeks Doctor Strange's help to restore his secret identity." }
+            ],
+            dc: [
+                { title: "The Batman", vote_average: 8.5, release_date: "2022", poster_path: "https://image.tmdb.org/t3/p/w500/74xTEgt7R3p0P1X64hN6gVlI0D9.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/74xTEgt7R3p0P1X64hN6gVlI0D9.jpg", overview: "Batman investigates corruption in Gotham City while pursuing the Riddler." },
+                { title: "Joker", vote_average: 8.6, release_date: "2019", poster_path: "https://image.tmdb.org/t3/p/w500/udI1w2L8R3p0P1X64hN6gVlI0D9.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/udI1w2L8R3p0P1X64hN6gVlI0D9.jpg", overview: "A mentally troubled comedian embarks on a downward spiral that leads to revolution." },
+                { title: "Zack Snyder's Justice League", vote_average: 8.7, release_date: "2021", poster_path: "https://image.tmdb.org/t3/p/w500/tnAuB2L8R3p0P1X64hN6gVlI0D9.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/tnAuB2L8R3p0P1X64hN6gVlI0D9.jpg", overview: "Bruce Wayne aligns forces with Diana Prince to recruit a team of metahumans." }
+            ],
+            tv: [
+                { title: "Mirzapur", vote_average: 8.5, release_date: "2024", poster_path: "https://image.tmdb.org/t3/p/w500/8Gxv8K8A2a2C1B2d3E4f5G6h7.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/8Gxv8K8A2a2C1B2d3E4f5G6h7.jpg", overview: "A shocking incident at a wedding procession ignites a feud in Purvanchal." },
+                { title: "The Family Man", vote_average: 8.8, release_date: "2021", poster_path: "https://image.tmdb.org/t3/p/w500/iA4iI9vL2Y3QzI2l7A8fE4r0M.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/iA4iI9vL2Y3QzI2l7A8fE4r0M.jpg", overview: "A working-class man secretly works as an intelligence officer." },
+                { title: "Stranger Things", vote_average: 8.7, release_date: "2022", poster_path: "https://image.tmdb.org/t3/p/w500/t6HIqrRAOXZM23321A8fE4r0M.jpg", backdrop_path: "https://image.tmdb.org/t3/p/w500/t6HIqrRAOXZM23321A8fE4r0M.jpg", overview: "When a young boy vanishes, a small town uncovers a mystery involving supernatural forces." }
             ]
         };
 
-        window.onload = () => { fetchMovies(); };
+        movieDatabase['movie'] = movieDatabase['te']; // Default Movies category
+
+        let currentCategory = 'te';
+
+        window.onload = () => { displayCategory('te'); };
 
         function updateActiveButton(btn) {
             if (btn) {
@@ -133,125 +150,105 @@
             }
         }
 
-        async function fetchMovies(customUrl = null) {
-            const container = document.getElementById("moviesContainer");
-            container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">Loading movies...</p>';
-
-            let url = customUrl;
-            if (!url) {
-                if (currentMode === 'category') {
-                    url = `${BASE_URL}/${currentType}/popular?api_key=${API_KEY}&page=1`;
-                } else if (currentMode === 'language') {
-                    url = `${BASE_URL}/discover/${currentType}?api_key=${API_KEY}&with_original_language=${currentLang}&sort_by=popularity.desc`;
-                }
-            }
-
-            try {
-                const res = await fetch(url);
-                const data = await res.json();
-                if (data && data.results && data.results.length > 0) {
-                    displayItems(data.results);
-                } else {
-                    displayItems(backupData[currentLang] || backupData['te']);
-                }
-            } catch (err) {
-                displayItems(backupData[currentLang] || backupData['te']);
-            }
-        }
-
-        function filterCategory(type, btn) {
+        function filterCategory(catKey, btn) {
             updateActiveButton(btn);
-            currentType = type;
-            currentMode = 'category';
-            fetchMovies();
+            currentCategory = catKey;
+            displayCategory(catKey);
         }
 
-        function filterLanguage(lang, btn) {
-            updateActiveButton(btn);
-            currentLang = lang;
-            currentMode = 'language';
-            fetchMovies();
-        }
-
-        function filterSpecial(company, btn) {
-            updateActiveButton(btn);
-            let companyId = company === 'marvel' ? '420' : '128064';
-            fetchMovies(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_companies=${companyId}&sort_by=popularity.desc`);
-        }
-
-        function displayItems(items) {
+        function displayCategory(catKey) {
             const container = document.getElementById('moviesContainer');
             container.innerHTML = '';
 
-            items.forEach(item => {
-                const title = item.title || item.name;
-                const release = item.release_date || item.first_air_date || 'N/A';
+            const list = movieDatabase[catKey] || movieDatabase['te'];
+
+            list.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'movie-card';
                 card.onclick = () => openModal(item);
                 card.innerHTML = `
-                    <img src="${item.poster_path ? (item.poster_path.startsWith('http') ? item.poster_path : IMG_URL + item.poster_path) : 'https://via.placeholder.com/500x750?text=Movie'}" alt="${title}">
+                    <img src="${item.poster_path}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/500x750?text=${encodeURIComponent(item.title)}'">
                     <div class="movie-info">
-                        <h3>${title}</h3>
-                        <p>⭐ ${item.vote_average ? item.vote_average.toFixed(1) : '8.0'} | 📅 ${release}</p>
+                        <h3>${item.title}</h3>
+                        <p>⭐ ${item.vote_average} | 📅 ${item.release_date}</p>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        // Search Suggestions
-        async function handleSearchInput(query) {
+        // Live Search Input & Suggestions
+        function handleSearchInput(query) {
             const box = document.getElementById('suggestionsBox');
             if (!query || query.trim().length < 2) {
                 box.innerHTML = '';
                 return;
             }
 
-            try {
-                const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
-                const data = await res.json();
-                const filtered = (data.results || []).slice(0, 5);
-                
-                box.innerHTML = '';
-                filtered.forEach(item => {
-                    const title = item.title || item.name;
-                    if (!title) return;
-                    const div = document.createElement('div');
-                    div.className = 'suggestion-item';
-                    div.innerHTML = `<span>${title} (${item.media_type === 'tv' ? 'Series' : 'Movie'})</span>`;
-                    div.onclick = () => {
-                        box.innerHTML = '';
-                        openModal(item);
-                    };
-                    box.appendChild(div);
-                });
-            } catch(e) {
-                box.innerHTML = '';
-            }
+            const term = query.toLowerCase();
+            let allMovies = [];
+            Object.values(movieDatabase).forEach(arr => allMovies.push(...arr));
+            
+            // Unique movies by title
+            const unique = Array.from(new Set(allMovies.map(a => a.title)))
+                .map(title => allMovies.find(a => a.title === title));
+
+            const matched = unique.filter(m => m.title.toLowerCase().includes(term)).slice(0, 5);
+
+            box.innerHTML = '';
+            matched.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.innerHTML = `<span>${item.title} (${item.release_date})</span>`;
+                div.onclick = () => {
+                    box.innerHTML = '';
+                    openModal(item);
+                };
+                box.appendChild(div);
+            });
         }
 
         function performSearch() {
-            const query = document.getElementById('searchInput').value;
-            if (query) {
-                document.getElementById('suggestionsBox').innerHTML = '';
-                fetchMovies(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            if (!query) return;
+
+            let allMovies = [];
+            Object.values(movieDatabase).forEach(arr => allMovies.push(...arr));
+            
+            const matched = allMovies.filter(m => m.title.toLowerCase().includes(query));
+            
+            const container = document.getElementById('moviesContainer');
+            container.innerHTML = '';
+            document.getElementById('suggestionsBox').innerHTML = '';
+
+            if (matched.length === 0) {
+                container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">No matching movies found in database.</p>';
+                return;
             }
+
+            matched.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'movie-card';
+                card.onclick = () => openModal(item);
+                card.innerHTML = `
+                    <img src="${item.poster_path}" alt="${item.title}">
+                    <div class="movie-info">
+                        <h3>${item.title}</h3>
+                        <p>⭐ ${item.vote_average} | 📅 ${item.release_date}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
         }
 
         function openModal(item) {
-            const title = item.title || item.name;
-            const release = item.release_date || item.first_air_date || 'N/A';
-            const overview = item.overview || 'No story details available.';
-            const backdrop = item.backdrop_path || item.poster_path;
+            document.getElementById('modalTitle').innerText = item.title;
+            document.getElementById('modalMeta').innerText = `⭐ Rating: ${item.vote_average} / 10 | 📅 Release: ${item.release_date}`;
+            document.getElementById('modalDesc').innerText = item.overview;
+            document.getElementById('modalImg').src = item.backdrop_path || item.poster_path;
 
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalMeta').innerText = `⭐ Rating: ${item.vote_average ? item.vote_average.toFixed(1) : '8.0'} / 10 | 📅 Release: ${release}`;
-            document.getElementById('modalDesc').innerText = overview;
-            document.getElementById('modalImg').src = backdrop ? (backdrop.startsWith('http') ? backdrop : IMG_URL + backdrop) : 'https://via.placeholder.com/500x280?text=No+Image';
-
-            document.getElementById('btnTrailer').href = `https://www.youtube.com/results?search_query=${encodeURIComponent(title + ' official trailer')}`;
-            document.getElementById('btnWatch').href = `https://www.google.com/search?q=${encodeURIComponent('where to watch ' + title + ' streaming online')}`;
+            document.getElementById('btnTrailer').href = `https://www.youtube.com/results?search_query=${encodeURIComponent(item.title + ' official trailer')}`;
+            document.getElementById('btnWatch').href = `https://www.google.com/search?q=${encodeURIComponent('where to watch ' + item.title + ' streaming online')}`;
 
             document.getElementById('movieModal').style.display = 'flex';
         }
