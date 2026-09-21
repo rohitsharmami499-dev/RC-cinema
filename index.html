@@ -186,25 +186,43 @@
             margin-top: 4px;
         }
 
-        /* Embedded Games Container */
-        .games-container {
+        /* Games Section Styling */
+        .games-section {
             padding: 20px;
             text-align: center;
         }
 
+        .games-menu {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .games-menu button {
+            background: #00d2ff;
+            color: #000;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
         .game-board {
             display: grid;
-            grid-template-columns: repeat(3, 80px);
+            grid-template-columns: repeat(3, 70px);
             gap: 5px;
-            margin: 20px auto;
-            width: 250px;
+            margin: 15px auto;
+            width: 220px;
         }
 
         .cell {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             background: #1e293b;
-            font-size: 2rem;
+            font-size: 1.8rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -233,7 +251,7 @@
         </div>
     </header>
 
-    <div class="sports-banner">
+    <div class="sports-banner" id="sportsBanner">
         <h3>🏏 FlashInfo Sports: Live Cricket Updates</h3>
         <p>Get instant live scores, upcoming match schedules & latest news directly on Cricbuzz.</p>
         <a href="https://m.cricbuzz.com/cricket-match/live-scores" target="_blank" class="btn-live">View Live Scores & Updates 🚀</a>
@@ -241,7 +259,7 @@
 
     <!-- Content Areas -->
     <div id="moviesContainer" class="movies-grid"></div>
-    <div id="gamesContainer" class="games-container" style="display:none;"></div>
+    <div id="gamesContainer" class="games-section" style="display:none;"></div>
 
     <script>
         const API_KEY = '59973be85848763e326b1c3ef9461129';
@@ -257,17 +275,19 @@
 
         async function fetchContent() {
             document.getElementById("gamesContainer").style.display = "none";
+            document.getElementById("sportsBanner").style.display = "block";
             const moviesCont = document.getElementById("moviesContainer");
             moviesCont.style.display = "grid";
-            moviesCont.innerHTML = '<p style="text-align:center; grid-column:1/-1;">Loading...</p>';
+            moviesCont.innerHTML = '<p style="text-align:center; grid-column:1/-1;">Loading movies...</p>';
 
+            // Try language based fetch first
             let url = `${BASE_URL}/discover/${currentType}?api_key=${API_KEY}&with_original_language=${currentLang}&sort_by=popularity.desc`;
 
             try {
                 let res = await fetch(url);
                 let data = await res.json();
                 
-                // Fallback if language API gives empty list
+                // If language list is empty, load standard popular items
                 if (!data.results || data.results.length === 0) {
                     url = `${BASE_URL}/${currentType}/popular?api_key=${API_KEY}`;
                     res = await fetch(url);
@@ -276,7 +296,14 @@
 
                 displayItems(data.results);
             } catch (err) {
-                moviesCont.innerHTML = '<p style="color:red; text-align:center; grid-column:1/-1;">Error loading data!</p>';
+                // Guaranteed fallback
+                try {
+                    let res = await fetch(`${BASE_URL}/${currentType}/popular?api_key=${API_KEY}`);
+                    let data = await res.json();
+                    displayItems(data.results);
+                } catch(e) {
+                    moviesCont.innerHTML = '<p style="color:red; text-align:center; grid-column:1/-1;">Error loading data!</p>';
+                }
             }
         }
 
@@ -355,22 +382,41 @@
             if(query) handleSearchInput(query);
         }
 
-        // Tic Tac Toe Embedded Game
-        let board = ["", "", "", "", "", "", "", "", ""];
-        let currentPlayer = "❌";
-
+        // --- MULTIPLE GAMES SECTION ---
         function showGamesSection() {
             document.getElementById("moviesContainer").style.display = "none";
+            document.getElementById("sportsBanner").style.display = "none";
             const gamesCont = document.getElementById("gamesContainer");
             gamesCont.style.display = "block";
             
             gamesCont.innerHTML = `
-                <h2>🎮 Tic Tac Toe Game</h2>
-                <h3 id="gameStatus" style="margin-top:10px;">Turn: ${currentPlayer}</h3>
+                <h2>🎮 Free Games Hub</h2>
+                <p style="color:#94a3b8; margin-bottom:15px;">Select a game to play directly!</p>
+                <div class="games-menu">
+                    <button onclick="loadTicTacToe()">❌ Tic Tac Toe</button>
+                    <button onclick="loadRPS()">✂️ Rock Paper Scissors</button>
+                    <button onclick="loadGuessNum()">🔢 Number Guessing</button>
+                </div>
+                <div id="activeGameArea"></div>
+            `;
+            loadTicTacToe();
+        }
+
+        // Game 1: Tic Tac Toe
+        let board = ["", "", "", "", "", "", "", "", ""];
+        let currentPlayer = "❌";
+
+        function loadTicTacToe() {
+            board = ["", "", "", "", "", "", "", "", ""];
+            currentPlayer = "❌";
+            const area = document.getElementById("activeGameArea");
+            area.innerHTML = `
+                <h3>Tic Tac Toe</h3>
+                <p id="gameStatus" style="margin-top:5px;">Turn: ${currentPlayer}</p>
                 <div class="game-board">
                     ${board.map((val, idx) => `<div class="cell" onclick="makeMove(${idx})">${val}</div>`).join('')}
                 </div>
-                <button onclick="resetGame()" style="padding:8px 16px; background:#eab308; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">Restart Game</button>
+                <button onclick="loadTicTacToe()" style="padding:6px 12px; background:#eab308; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">Restart</button>
             `;
         }
 
@@ -378,13 +424,73 @@
             if (board[index] !== "") return;
             board[index] = currentPlayer;
             currentPlayer = currentPlayer === "❌" ? "⭕" : "❌";
-            showGamesSection();
+            loadTicTacToeView();
         }
 
-        function resetGame() {
-            board = ["", "", "", "", "", "", "", "", ""];
-            currentPlayer = "❌";
-            showGamesSection();
+        function loadTicTacToeView() {
+            const area = document.getElementById("activeGameArea");
+            area.innerHTML = `
+                <h3>Tic Tac Toe</h3>
+                <p id="gameStatus" style="margin-top:5px;">Turn: ${currentPlayer}</p>
+                <div class="game-board">
+                    ${board.map((val, idx) => `<div class="cell" onclick="makeMove(${idx})">${val}</div>`).join('')}
+                </div>
+                <button onclick="loadTicTacToe()" style="padding:6px 12px; background:#eab308; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">Restart</button>
+            `;
+        }
+
+        // Game 2: Rock Paper Scissors
+        function loadRPS() {
+            const area = document.getElementById("activeGameArea");
+            area.innerHTML = `
+                <h3>Rock Paper Scissors</h3>
+                <p style="margin:10px 0;">Choose your move:</p>
+                <div style="display:flex; justify-center; gap:10px;">
+                    <button onclick="playRPS('✊')" style="font-size:24px; padding:10px;">✊</button>
+                    <button onclick="playRPS('✋')" style="font-size:24px; padding:10px;">✋</button>
+                    <button onclick="playRPS('✌️')" style="font-size:24px; padding:10px;">✌️</button>
+                </div>
+                <div id="rpsResult" style="margin-top:15px; font-size:16px;"></div>
+            `;
+        }
+
+        function playRPS(userChoice) {
+            const choices = ['✊', '✋', '✌️'];
+            const compChoice = choices[Math.floor(Math.random() * 3)];
+            let res = '';
+            if(userChoice === compChoice) res = "It's a Tie! 🤝";
+            else if(
+                (userChoice === '✊' && compChoice === '✌️') ||
+                (userChoice === '✋' && compChoice === '✊') ||
+                (userChoice === '✌️' && compChoice === '✋')
+            ) res = "You Won! 🎉";
+            else res = "Computer Won! 🤖";
+
+            document.getElementById("rpsResult").innerHTML = `You: ${userChoice} vs Comp: ${compChoice}<br><b>${res}</b>`;
+        }
+
+        // Game 3: Number Guessing
+        let targetNum = Math.floor(Math.random() * 20) + 1;
+        function loadGuessNum() {
+            targetNum = Math.floor(Math.random() * 20) + 1;
+            const area = document.getElementById("activeGameArea");
+            area.innerHTML = `
+                <h3>Guess Number (1 to 20)</h3>
+                <div style="margin:15px 0;">
+                    <input type="number" id="numInput" placeholder="Enter 1-20" style="padding:6px; width:100px; text-align:center;">
+                    <button onclick="checkGuess()" style="padding:6px 12px; background:#eab308; border:none; border-radius:4px; font-weight:bold;">Guess</button>
+                </div>
+                <div id="guessResult"></div>
+            `;
+        }
+
+        function checkGuess() {
+            const val = parseInt(document.getElementById("numInput").value);
+            const res = document.getElementById("guessResult");
+            if(!val) return;
+            if(val === targetNum) res.innerHTML = "🎉 Correct! You Guessed it!";
+            else if(val < targetNum) res.innerHTML = "📉 Too Low! Try again.";
+            else res.innerHTML = "📈 Too High! Try again.";
         }
     </script>
 </body>
